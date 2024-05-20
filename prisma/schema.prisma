@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum USER_ROLE {
+  user
+  admin
+  psychologist
+}
+
+model Users {
+  id                       String             @id @default(uuid())
+  username                 String             @unique
+  full_name                String
+  age                      Int
+  email                    String             @unique
+  password                 String
+  avatar_link              String?
+  role                     USER_ROLE          @default(user)
+  user_privacy             Boolean            @default(false)
+  is_verified              Boolean            @default(false)
+  last_logged_in           DateTime?
+  last_logged_in_formatted String?
+  created_at               DateTime           @default(now())
+  created_at_formatted     String
+  Screenings               Screenings[]
+  MusicMeditations         MusicMeditations[]
+  Journals                 Journals[]
+  Articles                 Articles[]
+}
+
+model Screenings {
+  id                   String   @id @default(uuid())
+  depression_score     Int
+  depression_status    String
+  anxiety_score        Int
+  anxiety_status       String
+  stress_score         Int
+  stress_status        String
+  created_by           String
+  created_at           DateTime @default(now())
+  created_at_formatted String
+
+  user Users? @relation(fields: [created_by], references: [id])
+}
+
+model MusicMeditations {
+  id                   String   @id @default(uuid())
+  title                String   @unique
+  author               String
+  genre                String[]
+  music_link           String
+  created_by           String
+  created_at           DateTime @default(now())
+  created_at_formatted String
+  user                 Users?   @relation(fields: [created_by], references: [id])
+}
+
+model Journals {
+  id                   String   @id @default(uuid())
+  title                String
+  emotion              String
+  content              String
+  created_by           String
+  created_at           DateTime @default(now())
+  created_at_formatted String
+  user                 Users?   @relation(fields: [created_by], references: [id])
+}
+
+model Articles {
+  id                    String   @id @default(uuid())
+  title                 String   @unique
+  content               String
+  article_type          String[]
+  images                String[]
+  created_at            DateTime @default(now())
+  created_at_formatted  String
+  created_by            String
+  modified_at           DateTime @default(now())
+  modified_at_formatted String
+  modified_by           String
+  user                  Users?   @relation(fields: [created_by], references: [id])
+}
