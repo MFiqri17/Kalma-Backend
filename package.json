@@ -8,8 +8,9 @@
     "dev": "nodemon index.ts",
     "format": "npx prettier --write .",
     "lint": "eslint . --ext .ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "build": "tsc && npm run copy-assets",
+    "start": "node dist/index.js",
+    "copy-assets": "cpx \"locales/**/*\" dist/locales && cpx \"public/**/*\" dist/public"
   },
   "author": "M. Fiqri Ananda",
   "license": "ISC",
@@ -51,6 +52,7 @@
     "@types/nodemailer": "^6.4.14",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
+    "cpx": "^1.5.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
