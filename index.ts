@@ -56,5 +56,5 @@ app.use(ENDPOINTS.SELF_SCREENING, SelfScreeningRouter);
 app.use(ENDPOINTS.JOURNALING, JournalingRouter);
 
 app.listen(PORT, () => {
-  console.log(`halo mas bro http://localhost:${PORT}`);
+  console.log('Server is running');
 });
