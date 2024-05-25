@@ -45,6 +45,9 @@ const verifyAccessToken = async (req: Request, res: Response, next: NextFunction
 const verifyRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
   const cookies = req.cookies;
   console.log('cookies from refresh token', cookies);
+  console.log('cookies from headers', req.headers.cookie);
+  console.log('ip of request', req.ip);
+  console.log('url of request', req.url);
   if (!cookies?.refreshToken) return res.status(401).json(invalidRefreshTokenResponse());
   const refreshToken = cookies?.refreshToken as string;
   if (!refreshToken) return res.status(401).json(invalidRefreshTokenResponse());

@@ -15,6 +15,8 @@ const authenticateUser = async (req: Request, res: Response) => {
     const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '15m');
     const refreshToken = generateToken(user!, process.env.REFRESH_TOKEN as Secret, '1d');
     console.log('generated refresh token', refreshToken);
+    console.log('ip of request', req.ip);
+    console.log('url of request', req.url);
     res.cookie('refreshToken', refreshToken, refreshTokenConfigResponse());
     return res.status(200).json(tokenUserResponse(accessToken, user!.is_verified, true));
   } catch (error) {
