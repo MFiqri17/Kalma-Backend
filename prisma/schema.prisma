@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
@@ -61,7 +60,7 @@ model Screenings {
 model MusicMeditations {
   id                   String   @id @default(uuid())
   title                String   @unique
-  author               String
+  author               String?
   genre                String[]
   music_link           String
   created_by           String
@@ -84,9 +83,8 @@ model Journals {
 model Articles {
   id                    String   @id @default(uuid())
   title                 String   @unique
-  content               String
+  content               Json
   article_type          String[]
-  images                String[]
   created_at            DateTime @default(now())
   created_at_formatted  String
   created_by            String

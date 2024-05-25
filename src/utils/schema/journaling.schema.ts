@@ -6,7 +6,6 @@ const sqlInjectionMessage = 'VALIDATION.SQLINJECTION';
 const emotionEnums = ['sad', 'angry', 'glad', 'elated'];
 
 const validateEmotion = (value: string) => {
-  console.log('mari test bung', emotionEnums.includes(value));
   return emotionEnums.includes(value);
 };
 

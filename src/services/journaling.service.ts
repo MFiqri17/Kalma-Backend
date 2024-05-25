@@ -5,30 +5,30 @@ import { createJournalPayload, getQueryPayload } from '../utils/types/payload';
 const createJournal = (journalData: createJournalPayload, userId: string) =>
   JournalingData.createJournal(journalData, userId);
 
-const getJournals = async (userId: string, getPayload?: Partial<getQueryPayload>) => {
+const getJournalsByUserId = async (userId: string, getPayload?: Partial<getQueryPayload>) => {
   if (getPayload) {
     const allColumns = ['emotion', 'content', 'created_at_formatted'];
     const whereCondition = getWhereConditionFunction(getPayload, allColumns);
     const [totalCount, data] = await Promise.all([
-      JournalingData.getJournalTotalForUser(userId, whereCondition),
-      JournalingData.getJournalForUser(userId, whereCondition, getPayload),
+      JournalingData.getJournalTotalByUserId(userId, whereCondition),
+      JournalingData.getJournalByUserId(userId, whereCondition, getPayload),
     ]);
     return { totalCount, data };
   }
   const [totalCount, data] = await Promise.all([
-    JournalingData.getJournalTotalForUserWithoutCondition(userId),
-    JournalingData.getJournalForUserWithoutCondition(userId),
+    JournalingData.getJournalTotalByUserIdWithoutCondition(userId),
+    JournalingData.getJournalByUserIdWithoutCondition(userId),
   ]);
   return { totalCount, data };
 };
 
-const getDetailJournal = (userId: string, journalId: string) =>
-  JournalingData.getJournalDetailForUser(userId, journalId);
+const getDetailJournalByUserId = (userId: string, journalId: string) =>
+  JournalingData.getJournalDetailByUserId(userId, journalId);
 
 const JournalingService = {
   createJournal,
-  getJournals,
-  getDetailJournal,
+  getJournalsByUserId,
+  getDetailJournalByUserId,
 };
 
 export default JournalingService;

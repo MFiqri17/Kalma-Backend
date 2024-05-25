@@ -23,7 +23,7 @@ const createJournal = async (req: Request, res: Response) => {
 
 const getJournalHistory = async (req: Request, res: Response) => {
   try {
-    const journalHistory = await JournalingService.getJournals(req.user!.id, req.body as getQueryPayload);
+    const journalHistory = await JournalingService.getJournalsByUserId(req.user!.id, req.body as getQueryPayload);
     return res.status(200).json(getJournalResponse(journalHistory, req.body as getQueryPayload));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientValidationError)
@@ -36,7 +36,7 @@ const getJournalHistory = async (req: Request, res: Response) => {
 const getJournalDetailHistory = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const journalDetailHistory = await JournalingService.getDetailJournal(req.user!.id, id);
+    const journalDetailHistory = await JournalingService.getDetailJournalByUserId(req.user!.id, id);
     if (!journalDetailHistory) return res.status(404).json(idNotFoundResponse(id));
     return res.status(200).json(getJournalDetailResponse(journalDetailHistory));
   } catch (error) {

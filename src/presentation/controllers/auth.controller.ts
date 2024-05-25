@@ -14,6 +14,7 @@ const authenticateUser = async (req: Request, res: Response) => {
     await UserService.updateLastLoggedInById(user!.id);
     const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '15m');
     const refreshToken = generateToken(user!, process.env.REFRESH_TOKEN as Secret, '1d');
+    console.log('generated refresh token', refreshToken);
     res.cookie('refreshToken', refreshToken, refreshTokenConfigResponse());
     return res.status(200).json(tokenUserResponse(accessToken, user!.is_verified, true));
   } catch (error) {
