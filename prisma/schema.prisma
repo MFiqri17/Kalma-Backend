@@ -38,8 +38,10 @@ model Users {
   created_at_formatted     String
   Screenings               Screenings[]
   MusicMeditations         MusicMeditations[]
+  ModifiedMusicMeditations MusicMeditations[] @relation(name: "modified")
   Journals                 Journals[]
   Articles                 Articles[]
+  ModifiedArticles         Articles[]         @relation(name: "modified")
 }
 
 model Screenings {
@@ -58,15 +60,19 @@ model Screenings {
 }
 
 model MusicMeditations {
-  id                   String   @id @default(uuid())
-  title                String   @unique
-  author               String?
-  genre                String[]
-  music_link           String
-  created_by           String
-  created_at           DateTime @default(now())
-  created_at_formatted String
-  user                 Users?   @relation(fields: [created_by], references: [id])
+  id                    String   @id @default(uuid())
+  title                 String   @unique
+  author                String?
+  genre                 String
+  music_link            String
+  created_by            String
+  created_at            DateTime @default(now())
+  created_at_formatted  String
+  modified_by           String
+  modified_at           DateTime @default(now())
+  modified_at_formatted String
+  user                  Users?   @relation(fields: [created_by], references: [id])
+  modifiedUser          Users?   @relation(fields: [modified_by], references: [id], name: "modified")
 }
 
 model Journals {
@@ -92,4 +98,5 @@ model Articles {
   modified_at_formatted String
   modified_by           String
   user                  Users?   @relation(fields: [created_by], references: [id])
+  modifiedUser          Users?   @relation(fields: [modified_by], references: [id], name: "modified")
 }

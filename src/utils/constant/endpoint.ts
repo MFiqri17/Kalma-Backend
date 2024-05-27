@@ -2,6 +2,7 @@ const ENDPOINTS = {
   GENERAL: '/api/user',
   SELF_SCREENING: '/api/self-screening',
   JOURNALING: '/api/self-management/journals',
+  MUSICMEDITATION: '/api/self-management/music-meditation',
   LOGIN: '/authenticate',
   REGISTER: '/register',
   GET_USER_PROPERTY: '/user-property',

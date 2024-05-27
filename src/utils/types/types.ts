@@ -39,3 +39,15 @@ export type JournalHistoryParams = {
   data: JournalData[];
   totalCount: number;
 };
+
+export type Music = {
+  id: string;
+  title: string;
+  author: string | null;
+  genre: string;
+  music_link: string;
+  created_by: string;
+  created_at_formatted: string;
+  modified_by: string;
+  modified_at_formatted: string;
+};

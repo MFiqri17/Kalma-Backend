@@ -13,6 +13,7 @@ import ENDPOINTS from './src/utils/constant/endpoint';
 import SelfScreeningRouter from './src/presentation/routes/selfScreening.route';
 import UserRouter from './src/presentation/routes/user.route';
 import JournalingRouter from './src/presentation/routes/journaling.route';
+import MusicRouter from './src/presentation/routes/music.route';
 
 declare module 'express' {
   interface Request {
@@ -54,6 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(ENDPOINTS.GENERAL, UserRouter);
 app.use(ENDPOINTS.SELF_SCREENING, SelfScreeningRouter);
 app.use(ENDPOINTS.JOURNALING, JournalingRouter);
+app.use(ENDPOINTS.MUSICMEDITATION, MusicRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running in PORT ${PORT}`);

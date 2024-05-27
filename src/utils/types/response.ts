@@ -96,6 +96,15 @@ export type TJournalData = {
   created_date: string;
 };
 
+export type TMusicData = {
+  id: string;
+  title: string;
+  author: string | null;
+  genre: string;
+  music_link: string;
+  created_date: string;
+};
+
 export type TCreateJournal = TDefault & {
   data: TJournalData;
 };
@@ -107,4 +116,8 @@ export type TGetJournalHistory = TDefault &
 
 export type TGetJournalHistoryDetail = TDefault & {
   data: TJournalData;
+};
+
+export type TCreateMusic = TDefault & {
+  data: TMusicData;
 };

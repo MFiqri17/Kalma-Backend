@@ -13,8 +13,16 @@ import {
   TGetJournalHistory,
   TGetJournalHistoryDetail,
   TJournalData,
+  TCreateMusic,
 } from '../types/response';
-import { User, SelfScreeningData, SelfScreeningHistoryParams, JournalData, JournalHistoryParams } from '../types/types';
+import {
+  User,
+  SelfScreeningData,
+  SelfScreeningHistoryParams,
+  JournalData,
+  JournalHistoryParams,
+  Music,
+} from '../types/types';
 import { capitalizeFirstLetter } from './formatTextFunction';
 import { isSevere, selfScreeningGetterFunction } from './selfScreeningFunction';
 import { t } from 'i18next';
@@ -42,6 +50,7 @@ export const invalidLinkTokenResponse = () => defaultResponse(false, 'VALIDATION
 export const emailIsVerifiedResponse = () => defaultResponse(false, 'VALIDATION.EMAILISVERIFIED');
 export const emailIsNotVerifiedResponse = () => defaultResponse(false, 'VALIDATION.EMAILISNOTVERIFIED');
 export const existedUserResponse = () => defaultResponse(false, 'VALIDATION.EXISTEDUSER');
+export const existedDataResponse = (title: string) => defaultResponse(false, 'VALIDATION.EXISTEDDATA', 'FIELD', title);
 export const passwordDoNotMatch = () => defaultResponse(false, 'VALIDATION.PASSWORDSDONOTMATCH');
 
 export const sendEmaiResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.SENDEMAILVERIFICATION');
@@ -232,6 +241,17 @@ export const getJournalDetailResponse = (journalData: JournalData): TGetJournalH
   };
   return {
     ...defaultResponse(true, 'SUCCESSRESPONSE.GETJOURNALDETAILHISTORY', 'ID', data.id),
+    data,
+  };
+};
+
+export const createMusicResponse = (musicData: Music): TCreateMusic => {
+  const data = {
+    created_date: musicData.created_at_formatted,
+    ...musicData,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.CREATEMUSIC'),
     data,
   };
 };
