@@ -14,6 +14,10 @@ import {
   TGetJournalHistoryDetail,
   TJournalData,
   TCreateMusic,
+  TGetMusic,
+  TGetMusicDetail,
+  TUpdateMusic,
+  TGetUserJournalForPsychologist,
 } from '../types/response';
 import {
   User,
@@ -22,13 +26,14 @@ import {
   JournalData,
   JournalHistoryParams,
   Music,
+  MusicAllData,
 } from '../types/types';
 import { capitalizeFirstLetter } from './formatTextFunction';
 import { isSevere, selfScreeningGetterFunction } from './selfScreeningFunction';
 import { t } from 'i18next';
 import DASS_SCORE from '../constant/variable';
 import { ZodError } from 'zod';
-import { capitalCase, sentenceCase, upperCase } from 'text-case';
+import { capitalCase, sentenceCase, titleCase, upperCase } from 'text-case';
 import { getQueryPayload } from '../types/payload';
 
 export const defaultResponse = (
@@ -42,7 +47,7 @@ export const defaultResponse = (
 });
 
 export const serverErrorResponse = () => defaultResponse(false, 'ERRORRESPONSE.INTERNALSERVERERROR');
-export const idNotFoundResponse = (id: string) => defaultResponse(false, 'ERRORRESPONSE.NOTFOUND', 'ID', id);
+export const idNotFoundResponse = (id: string) => defaultResponse(false, 'ERRORRESPONSE.IDNOTFOUND', 'ID', id);
 export const invalidCredentialResponse = () => defaultResponse(false, 'VALIDATION.WRONGCREDENTIALS');
 export const invalidAccessTokenResponse = () => defaultResponse(false, 'VALIDATION.INVALIDACCESSTOKEN');
 export const invalidRefreshTokenResponse = () => defaultResponse(false, 'VALIDATION.INVALIDREFRESHTOKEN');
@@ -52,6 +57,11 @@ export const emailIsNotVerifiedResponse = () => defaultResponse(false, 'VALIDATI
 export const existedUserResponse = () => defaultResponse(false, 'VALIDATION.EXISTEDUSER');
 export const existedDataResponse = (title: string) => defaultResponse(false, 'VALIDATION.EXISTEDDATA', 'FIELD', title);
 export const passwordDoNotMatch = () => defaultResponse(false, 'VALIDATION.PASSWORDSDONOTMATCH');
+export const forbiddenAccessResponse = () => defaultResponse(false, 'ERRORRESPONSE.FORBIDDENACCESS');
+export const isNotAllowedSeenJournalResponse = (user: string) =>
+  defaultResponse(false, 'VALIDATION.USERNOTALLOWEDSEENJOURNAL', 'USER', user);
+export const nameNotFoundResponse = (username_or_fullname: string) =>
+  defaultResponse(false, 'ERRORRESPONSE.IDNOTFOUND', 'NAME', username_or_fullname);
 
 export const sendEmaiResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.SENDEMAILVERIFICATION');
 export const verifyEmailResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL');
@@ -78,7 +88,7 @@ export const getUserResponse = (userData: User): TGetUser => {
     email: userData.email,
     age: userData.age,
     avatar_link: userData.avatar_link!,
-    user_privacy: userData.user_privacy,
+    allow_journal: userData.allow_journal,
     last_logged_in: userData.last_logged_in_formatted,
   };
   return {
@@ -94,7 +104,7 @@ export const updateUserResponse = (userData: User, isEmailChanged: boolean): TUp
     email: userData.email,
     age: userData.age,
     avatar_link: userData.avatar_link!,
-    user_privacy: userData.user_privacy,
+    allow_journal: userData.allow_journal,
   };
   const message = isEmailChanged ? 'SUCCESSRESPONSE.UPDATEUSERANDEMAIL' : 'SUCCESSRESPONSE.UPDATEUSER';
   return {
@@ -120,7 +130,7 @@ export const tokenUserResponse = (accessToken: string, isVerified: boolean, isAc
 export const refreshTokenConfigResponse = (): CookieOptions => ({
   httpOnly: true,
   // secure: true,
-  sameSite: 'none',
+  sameSite: 'strict',
   maxAge: 24 * 60 * 60 * 1000,
 });
 
@@ -215,7 +225,10 @@ export const getJournalResponse = (
 ): TGetJournalHistory => {
   const { page } = getQueryPayload;
   const data: TJournalData[] = journalData.data.map((journal) => ({
-    ...journal,
+    id: journal.id,
+    title: journal.title,
+    emotion: journal.emotion,
+    content: journal.content,
     created_date: journal.created_at_formatted,
   }));
   const totalItems = journalData.totalCount;
@@ -234,10 +247,48 @@ export const getJournalResponse = (
   };
 };
 
+export const getJournalResponseForPsychologist = (
+  journalData: JournalHistoryParams,
+  userData: Partial<User>,
+  getQueryPayload: Partial<getQueryPayload>,
+): TGetUserJournalForPsychologist => {
+  const { page } = getQueryPayload;
+  const journal: TJournalData[] = journalData.data.map((journal) => ({
+    id: journal.id,
+    title: journal.title,
+    emotion: journal.emotion,
+    content: journal.content,
+    created_date: journal.created_at_formatted,
+  }));
+  const user = {
+    username: userData.username,
+    full_name: titleCase(userData.full_name as string),
+    age: userData.age,
+  };
+  const totalItems = journalData.totalCount;
+  const sizeData = journal.length;
+  const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
+  const getResponseProps = {
+    size: sizeData,
+    page: page ?? 1,
+    total_items: totalItems,
+    total_pages: totalPages,
+  };
+  return {
+    ...getResponseProps,
+    user_data: user,
+    journal_data: journal,
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETJOURNALHISTORY'),
+  };
+};
+
 export const getJournalDetailResponse = (journalData: JournalData): TGetJournalHistoryDetail => {
   const data = {
+    id: journalData.id,
+    title: journalData.title,
+    emotion: journalData.emotion,
+    content: journalData.content,
     created_date: journalData.created_at_formatted,
-    ...journalData,
   };
   return {
     ...defaultResponse(true, 'SUCCESSRESPONSE.GETJOURNALDETAILHISTORY', 'ID', data.id),
@@ -248,6 +299,7 @@ export const getJournalDetailResponse = (journalData: JournalData): TGetJournalH
 export const createMusicResponse = (musicData: Music): TCreateMusic => {
   const data = {
     created_date: musicData.created_at_formatted,
+    updated_date: musicData.modified_at_formatted,
     ...musicData,
   };
   return {
@@ -255,6 +307,61 @@ export const createMusicResponse = (musicData: Music): TCreateMusic => {
     data,
   };
 };
+
+export const getMusicResponse = (musicAllData: MusicAllData, getQueryPayload: Partial<getQueryPayload>): TGetMusic => {
+  const { page } = getQueryPayload;
+  const data = musicAllData.data.map((data) => ({
+    created_by: data.user?.full_name,
+    created_date: data.created_at_formatted,
+    updated_by: data.modifiedUser?.full_name,
+    updated_date: data.modified_at_formatted,
+    ...data,
+  }));
+  const totalItems = musicAllData.totalCount;
+  const sizeData = data.length;
+  const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
+  const getResponseProps = {
+    size: sizeData,
+    page: page ?? 1,
+    total_items: totalItems,
+    total_pages: totalPages,
+  };
+  return {
+    ...getResponseProps,
+    data,
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETMUSICDATA'),
+  };
+};
+
+export const getDetailMusicResponse = (musicData: Music): TGetMusicDetail => {
+  const data = {
+    created_by: musicData.user?.full_name,
+    created_date: musicData.created_at_formatted,
+    updated_by: musicData.modifiedUser?.full_name,
+    updated_date: musicData.modified_at_formatted,
+    ...musicData,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETDETAILMUSICDATA', 'ID', data.id),
+    data,
+  };
+};
+
+export const updateMusicResponse = (musicData: Music): TUpdateMusic => {
+  const data = {
+    created_by: musicData.user?.full_name,
+    created_date: musicData.created_at_formatted,
+    updated_by: musicData.modifiedUser?.full_name,
+    updated_date: musicData.modified_at_formatted,
+    ...musicData,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.UPDATEMUSICDATA', 'ID', data.id),
+    data,
+  };
+};
+
+export const deleteMusicResponse = (id: string) => defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', id);
 
 export const handleErrorEmptyDataResponse = (getQueryPayload: Partial<getQueryPayload>): TSelfScreeningHistory => ({
   page: getQueryPayload.page ?? 1,

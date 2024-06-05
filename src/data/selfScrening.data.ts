@@ -1,8 +1,9 @@
 import prisma from './prisma';
-import { getQueryPayload, selfScreeningFormatedPayload } from '../utils/types/payload';
-import { getFormatDate } from '../utils/functions/coditionFunctions';
+import { getQueryPayload } from '../utils/types/payload';
+import { selfScreeningExtendedPayload } from '../utils/types/types';
+import { getFormatDate } from '../utils/functions/conditionFunctions';
 
-const createSelfScreening = (screeningData: selfScreeningFormatedPayload, userId: string) =>
+const createSelfScreening = (screeningData: selfScreeningExtendedPayload, userId: string) =>
   prisma.screenings.create({
     data: {
       created_by: userId,

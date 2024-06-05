@@ -25,6 +25,7 @@ import {
   updateUserPayload,
 } from '../../utils/types/payload';
 import { lowerCase } from 'text-case';
+import PATH from '../../utils/constant/path';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -38,7 +39,28 @@ const createUser = async (req: Request, res: Response) => {
     };
     const newUser = await UserService.createUser(userPayload);
     const verificationToken = generateToken(newUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-    EmailService.vericationEmail(newUser, verificationToken);
+    EmailService.verificationEmail(newUser, verificationToken, PATH.VERIFICATION_EMAIL);
+    return res.status(201).json(createUserResponse(newUser));
+  } catch (error) {
+    console.error('Error creating user:', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const createPsycholog = async (req: Request, res: Response) => {
+  try {
+    const { password, full_name, ...restBodyRequest } = req.body as createUserPayload;
+    const hashedPassword = await AuthService.hashPassword(password);
+    const lowerCaseName = lowerCase(full_name);
+    const userPayload = {
+      ...restBodyRequest,
+      role: 'psychologist',
+      full_name: lowerCaseName,
+      password: hashedPassword,
+    };
+    const newUser = await UserService.createUser(userPayload);
+    const verificationToken = generateToken(newUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
+    EmailService.verificationEmail(newUser, verificationToken, PATH.VERIFICATION_EMAIL);
     return res.status(201).json(createUserResponse(newUser));
   } catch (error) {
     console.error('Error creating user:', error);
@@ -73,7 +95,7 @@ const updateUserProperty = async (req: Request, res: Response) => {
     if (isEmailChanged) {
       const verificationToken = generateToken(updatedUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
       await UserService.unverifyUserById(userFound.id);
-      EmailService.verificationEmailChanged(updatedUser, verificationToken);
+      EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL);
       return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
     }
     return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
@@ -89,7 +111,7 @@ const sendEmailVerification = async (req: Request, res: Response) => {
     const isEmailVerified = UserService.isEmailVerified(user!.is_verified);
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
     const verificationToken = generateToken(user!, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-    EmailService.verificationEmailAgain(user!, verificationToken);
+    EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
     return res.status(200).json(sendEmaiResponse());
   } catch (error) {
     console.log('Error send email verification', error);
@@ -117,7 +139,7 @@ const forgotPassword = async (req: Request, res: Response) => {
     if (!user) return res.status(400).json(invalidCredentialResponse());
     const forgotPasswordToken = generateToken(user, process.env.FORGOT_PASSWORD_TOKEN as Secret, '5m');
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none' });
-    EmailService.forgotPasswordEmail(user, forgotPasswordToken);
+    EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
     return res.status(200).json(forgotPasswordResponse());
   } catch (error) {
     console.log('Error forgot password', error);
@@ -142,6 +164,7 @@ const resetPassword = async (req: Request, res: Response) => {
 
 const UserController = {
   createUser,
+  createPsycholog,
   getUserProperty,
   updateUserProperty,
   sendEmailVerification,

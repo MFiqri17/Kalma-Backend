@@ -19,14 +19,6 @@ export type resetPasswordPayload = z.infer<typeof resetPasswordSchema>;
 export type createJournalPayload = z.infer<typeof createJournal>;
 export type createMusicPayload = z.infer<typeof createMusicSchema>;
 export type updateMusicPayload = z.infer<typeof updateMusicSchema>;
-export type selfScreeningFormatedPayload = {
-  depression_score: number;
-  depression_status: string;
-  anxiety_score: number;
-  anxiety_status: string;
-  stress_score: number;
-  stress_status: string;
-};
 export type getQueryPayload = {
   size: number;
   page: number;

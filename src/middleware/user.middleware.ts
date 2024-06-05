@@ -5,10 +5,12 @@ import { User } from '../utils/types/types';
 import {
   emailIsNotVerifiedResponse,
   existedUserResponse,
+  forbiddenAccessResponse,
   invalidLinkTokenResponse,
   serverErrorResponse,
 } from '../utils/functions/responseFunction';
 import { createUserPayload } from '../utils/types/payload';
+import { USER_ROLE } from '@prisma/client';
 
 const checkExistingUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -57,11 +59,25 @@ const verifyForgotPasswordToken = (req: Request, res: Response, next: NextFuncti
   }
 };
 
+const checkUserRole = (userRole: USER_ROLE[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await UserService.getUserById(req.user!.id);
+      if (!userRole.includes(user!.role)) return res.status(403).json(forbiddenAccessResponse());
+      next();
+    } catch (error) {
+      console.error('Error verify user role', error);
+      return res.status(500).json(serverErrorResponse());
+    }
+  };
+};
+
 const UserMiddleware = {
   checkExistingUser,
   isUserEmailVerified,
   verifyEmailVerificationToken,
   verifyForgotPasswordToken,
+  checkUserRole,
 };
 
 export default UserMiddleware;

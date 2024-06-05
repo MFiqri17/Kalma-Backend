@@ -23,7 +23,7 @@ export type TGetUserData = {
   email: string;
   age: number;
   avatar_link: string | null;
-  user_privacy: boolean;
+  allow_journal: boolean;
   last_logged_in: string | null;
 };
 
@@ -33,7 +33,7 @@ export type TUpdateUserData = {
   email: string;
   age: number;
   avatar_link: string | null;
-  user_privacy: boolean;
+  allow_journal: boolean;
 };
 
 export type TTokenUserData = {
@@ -102,7 +102,10 @@ export type TMusicData = {
   author: string | null;
   genre: string;
   music_link: string;
+  created_by?: string;
   created_date: string;
+  updated_by?: string;
+  updated_date: string;
 };
 
 export type TCreateJournal = TDefault & {
@@ -114,10 +117,29 @@ export type TGetJournalHistory = TDefault &
     data: TJournalData[];
   };
 
+export type TGetUserJournalForPsychologist = TDefault &
+  TGetResponseDefault & {
+    user_data: Partial<TGetUserData>;
+    journal_data: TJournalData[];
+  };
+
 export type TGetJournalHistoryDetail = TDefault & {
   data: TJournalData;
 };
 
 export type TCreateMusic = TDefault & {
+  data: TMusicData;
+};
+
+export type TGetMusic = TDefault &
+  TGetResponseDefault & {
+    data: TMusicData[];
+  };
+
+export type TGetMusicDetail = TDefault & {
+  data: TMusicData;
+};
+
+export type TUpdateMusic = TDefault & {
   data: TMusicData;
 };

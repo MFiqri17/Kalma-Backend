@@ -1,5 +1,5 @@
 import { USER_ROLE } from '@prisma/client';
-import { selfScreeningFormatedPayload, createJournalPayload } from './payload';
+import { createJournalPayload, selfScreeningPayload } from './payload';
 
 export type User = {
   id: string;
@@ -10,7 +10,7 @@ export type User = {
   password: string;
   avatar_link?: string | null;
   role: USER_ROLE;
-  user_privacy: boolean;
+  allow_journal: boolean;
   is_verified: boolean;
   last_logged_in: Date | null;
   last_logged_in_formatted: string | null;
@@ -18,10 +18,28 @@ export type User = {
   created_at_formatted: string;
 };
 
-export type SelfScreeningData = selfScreeningFormatedPayload & {
+export type selfScreeningExtendedPayload = selfScreeningPayload & {
+  depression_status: string;
+  anxiety_status: string;
+  stress_status: string;
+};
+
+export type SelfScreeningData = selfScreeningExtendedPayload & {
   id: string;
   created_at_formatted: string;
   created_by: string;
+};
+
+export type Music = {
+  id: string;
+  title: string;
+  author: string | null;
+  genre: string;
+  music_link: string;
+  user?: Pick<User, 'full_name'> | null;
+  modifiedUser?: Pick<User, 'full_name'> | null;
+  created_at_formatted: string;
+  modified_at_formatted: string;
 };
 
 export type SelfScreeningHistoryParams = {
@@ -40,14 +58,7 @@ export type JournalHistoryParams = {
   totalCount: number;
 };
 
-export type Music = {
-  id: string;
-  title: string;
-  author: string | null;
-  genre: string;
-  music_link: string;
-  created_by: string;
-  created_at_formatted: string;
-  modified_by: string;
-  modified_at_formatted: string;
+export type MusicAllData = {
+  data: Music[];
+  totalCount: number;
 };

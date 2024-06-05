@@ -1,5 +1,5 @@
 import JournalingData from '../data/journaling.data';
-import { getWhereConditionFunction } from '../utils/functions/coditionFunctions';
+import { getWhereConditionFunction } from '../utils/functions/conditionFunctions';
 import { createJournalPayload, getQueryPayload } from '../utils/types/payload';
 
 const createJournal = (journalData: createJournalPayload, userId: string) =>

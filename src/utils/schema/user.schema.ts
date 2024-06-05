@@ -86,7 +86,7 @@ export const updateUserSchema = z.object({
     .custom<Express.Multer.File>((val) => typeof val !== 'string' && val !== '', invalidImageFileFormat)
     .refine((file) => file && file.mimetype.startsWith('image/'), invalidImageFileFormat)
     .optional(),
-  user_privacy: z
+  allow_journal: z
     .string({ required_error: requiredMessage })
     .min(1, { message: requiredMessage })
     .trim()

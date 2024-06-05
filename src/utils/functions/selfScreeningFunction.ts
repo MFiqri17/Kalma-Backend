@@ -1,8 +1,9 @@
 import DASS_SCORE from '../constant/variable';
 import { t } from 'i18next';
 import { constantCase, lowerCase } from 'text-case';
-import { selfScreeningFormatedPayload, selfScreeningPayload } from '../types/payload';
+import { selfScreeningPayload } from '../types/payload';
 import { TSelfScreeningItem } from '../types/response';
+import { selfScreeningExtendedPayload } from '../types/types';
 
 type ScoreRange = {
   min: number;
@@ -63,7 +64,7 @@ export const stressScoreFunction = (stress_score: number) => {
 
 export const selfScreeningSetterFunction = (
   selfScreeningPayload: selfScreeningPayload,
-): selfScreeningFormatedPayload => {
+): selfScreeningExtendedPayload => {
   const { depression_score, anxiety_score, stress_score } = selfScreeningPayload;
   const data = {
     ...depressionScoreFunction(depression_score),
@@ -73,7 +74,7 @@ export const selfScreeningSetterFunction = (
   return data;
 };
 
-export const selfScreeningGetterFunction = (selfScreeningPayload: selfScreeningFormatedPayload): TSelfScreeningItem => {
+export const selfScreeningGetterFunction = (selfScreeningPayload: selfScreeningExtendedPayload): TSelfScreeningItem => {
   const { depression_score, anxiety_score, stress_score, depression_status, anxiety_status, stress_status } =
     selfScreeningPayload;
   const data = {

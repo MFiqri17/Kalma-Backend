@@ -30,8 +30,9 @@ model Users {
   password                 String
   avatar_link              String?
   role                     USER_ROLE          @default(user)
-  user_privacy             Boolean            @default(false)
+  allow_journal            Boolean            @default(false)
   is_verified              Boolean            @default(false)
+  is_approved              Boolean            @default(false)
   last_logged_in           DateTime?
   last_logged_in_formatted String?
   created_at               DateTime           @default(now())

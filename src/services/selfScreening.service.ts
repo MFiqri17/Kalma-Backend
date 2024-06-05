@@ -1,8 +1,9 @@
-import { getQueryPayload, selfScreeningFormatedPayload } from '../utils/types/payload';
+import { getQueryPayload } from '../utils/types/payload';
+import { selfScreeningExtendedPayload } from '../utils/types/types';
 import SelfScreeningData from '../data/selfScrening.data';
-import { getWhereConditionFunction, isIntegerExceptYearValue } from '../utils/functions/coditionFunctions';
+import { getWhereConditionFunction, isIntegerExceptYearValue } from '../utils/functions/conditionFunctions';
 
-const createSelfScreening = (screeningData: selfScreeningFormatedPayload, userId: string) =>
+const createSelfScreening = (screeningData: selfScreeningExtendedPayload, userId: string) =>
   SelfScreeningData.createSelfScreening(screeningData, userId);
 
 const getSelfScreenings = async (userId: string, getPayload?: Partial<getQueryPayload>) => {

@@ -20,6 +20,9 @@ const getUserByEmailOrUsernameOneParams = (email_or_username: string) =>
 const getUserByEmailOrUsernameTwoParams = (email: string, username: string) =>
   UserData.getUserByEmailOrUsernameTwoParams(email, username);
 
+const getUserByUsernameOrFullName = (username_or_fullname: string) =>
+  UserData.getUserByUsernameOrFullName(username_or_fullname);
+
 const getUserByEmail = (email: string) => UserData.getUserByEmail(email);
 
 const getUserByUsername = (username: string) => UserData.getUserByUsername(username);
@@ -55,6 +58,7 @@ const UserService = {
   createUser,
   getUserByEmailOrUsernameOneParams,
   getUserByEmailOrUsernameTwoParams,
+  getUserByUsernameOrFullName,
   getUserByEmail,
   getUserByUsername,
   getUserById,

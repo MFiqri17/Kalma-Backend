@@ -1,5 +1,5 @@
 import { createJournalPayload, getQueryPayload } from '../utils/types/payload';
-import { getFormatDate } from '../utils/functions/coditionFunctions';
+import { getFormatDate } from '../utils/functions/conditionFunctions';
 import prisma from './prisma';
 
 const createJournal = (journalData: createJournalPayload, userId: string) =>

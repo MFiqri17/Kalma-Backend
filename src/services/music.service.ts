@@ -1,6 +1,7 @@
 import MusicData from '../data/music.data';
+import { getWhereConditionFunction } from '../utils/functions/conditionFunctions';
 import { deleteFromCloudinary, uploadToCloudinary } from '../utils/functions/fileFunction';
-import { createMusicPayload, updateMusicPayload } from '../utils/types/payload';
+import { createMusicPayload, getQueryPayload, updateMusicPayload } from '../utils/types/payload';
 import { Music } from '../utils/types/types';
 
 const getMusicByTitle = (title: string) => MusicData.getMusicByTitle(title);
@@ -27,10 +28,36 @@ const updateMusic = async (musicPayload: updateMusicPayload, musicFound: Music, 
   }
 };
 
+const getMusic = async (getPayload?: Partial<getQueryPayload>) => {
+  if (getPayload) {
+    const allColumns = ['title', 'author', 'genre', 'created_at_formatted', 'modified_at_formatted'];
+    const whereCondition = getWhereConditionFunction(getPayload, allColumns);
+    const [totalCount, data] = await Promise.all([
+      MusicData.getMusicTotal(whereCondition),
+      MusicData.getMusic(whereCondition, getPayload),
+    ]);
+    return { totalCount, data };
+  }
+  const [totalCount, data] = await Promise.all([
+    MusicData.getMusicTotalWithoutCondition(),
+    MusicData.getMusicWithoutCondition(),
+  ]);
+  return { totalCount, data };
+};
+
+const getMusicById = (musicId: string) => MusicData.getMusicById(musicId);
+const deleteMusicById = async (musicId: string, musicLink: string) => {
+  await deleteFromCloudinary(musicLink);
+  return MusicData.deleteMusicById(musicId);
+};
+
 const MusicService = {
   getMusicByTitle,
   createMusic,
   updateMusic,
+  getMusic,
+  getMusicById,
+  deleteMusicById,
 };
 
 export default MusicService;
