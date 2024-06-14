@@ -24,41 +24,68 @@ UserRouter.post(
   UserMiddleware.checkExistingUser,
   UserController.createUser,
 );
+
 UserRouter.post(
   ENDPOINTS.LOGIN,
   formValidationMiddleware(authenticateUserSchema),
   AuthMiddleware.checkUserCredentials,
   AuthController.authenticateUser,
 );
+
 UserRouter.put(
   ENDPOINTS.UPDATE_USER_PROPERTY,
   AuthMiddleware.verifyAccessToken,
-  UserMiddleware.checkExistingUser,
+  UserMiddleware.isUserEmailVerified,
+  UserMiddleware.checkUserRole(['user', 'psychologist']),
+  UserMiddleware.isAccountApproved,
   upload.single('avatar'),
+  UserMiddleware.checkExistingUser,
   formValidationMiddleware(updateUserSchema),
   UserController.updateUserProperty,
 );
+
 UserRouter.post(
   ENDPOINTS.SEND_VERIFICATION_EMAIL,
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.checkUserRole(['user', 'psychologist']),
   UserController.sendEmailVerification,
 );
+
 UserRouter.post(
   ENDPOINTS.FORGOT_PASSWORD,
   formValidationMiddleware(forgotPasswordSchema),
   UserController.forgotPassword,
 );
+
 UserRouter.patch(
   `${ENDPOINTS.RESET_PASWORD}/:token`,
   formValidationMiddleware(resetPasswordSchema),
   UserMiddleware.verifyForgotPasswordToken,
   UserController.resetPassword,
 );
-UserRouter.get(ENDPOINTS.GET_USER_PROPERTY, AuthMiddleware.verifyAccessToken, UserController.getUserProperty);
+
+UserRouter.get(
+  ENDPOINTS.GET_USER_PROPERTY,
+  AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
+  UserMiddleware.isAccountApproved,
+  UserController.getUserProperty,
+);
+
+UserRouter.get(
+  ENDPOINTS.GET_USER_ROLE,
+  AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
+  UserMiddleware.isAccountApproved,
+  UserController.getUserRole,
+);
+
 UserRouter.get(ENDPOINTS.REFRESH_TOKEN, AuthMiddleware.verifyRefreshToken, AuthController.refreshUserToken);
+
 UserRouter.get(
   `${ENDPOINTS.VERIFY_EMAIL}/:token`,
   UserMiddleware.verifyEmailVerificationToken,
+  UserMiddleware.checkUserRole(['user', 'psychologist']),
   UserController.verifyEmail,
 );
 

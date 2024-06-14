@@ -50,6 +50,7 @@ export const uploadToCloudinary = (buffer: Buffer, mimetype: string): Promise<Up
 
 export const deleteFromCloudinary = async (fileUrl: string) => {
   const publicId = getPublicIdFromUrl(fileUrl).trim();
+  console.log(publicId);
   await cloudinary.uploader.destroy(publicId, (error, result) => {
     if (error) {
       console.log('error', error);

@@ -20,7 +20,7 @@ const checkUserCredentials = async (req: Request, res: Response, next: NextFunct
     req.user = user;
     next();
   } catch (error) {
-    console.log('Error verify user credentials', error);
+    console.error('Error verify user credentials', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -37,7 +37,7 @@ const verifyAccessToken = async (req: Request, res: Response, next: NextFunction
     req.user = userExisted!;
     next();
   } catch (error) {
-    console.log('Error verify access Token', error);
+    console.error('Error verify access Token', error);
     return res.status(401).json(invalidAccessTokenResponse());
   }
 };
@@ -55,7 +55,7 @@ const verifyRefreshToken = async (req: Request, res: Response, next: NextFunctio
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none' });
     next();
   } catch (error) {
-    console.log('Error verify refresh Token', error);
+    console.error('Error verify refresh Token', error);
     return res.status(401).json(invalidRefreshTokenResponse());
   }
 };

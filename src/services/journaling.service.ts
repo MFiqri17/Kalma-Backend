@@ -6,8 +6,8 @@ const createJournal = (journalData: createJournalPayload, userId: string) =>
   JournalingData.createJournal(journalData, userId);
 
 const getJournalsByUserId = async (userId: string, getPayload?: Partial<getQueryPayload>) => {
-  if (getPayload) {
-    const allColumns = ['emotion', 'content', 'created_at_formatted'];
+  if (getPayload && Object.keys(getPayload).length > 0) {
+    const allColumns = ['title', 'emotion', 'content', 'created_at_formatted'];
     const whereCondition = getWhereConditionFunction(getPayload, allColumns);
     const [totalCount, data] = await Promise.all([
       JournalingData.getJournalTotalByUserId(userId, whereCondition),

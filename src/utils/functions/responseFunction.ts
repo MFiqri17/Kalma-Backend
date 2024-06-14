@@ -18,6 +18,11 @@ import {
   TGetMusicDetail,
   TUpdateMusic,
   TGetUserJournalForPsychologist,
+  TGetPsycholog,
+  TCreateArticle,
+  TGetArticle,
+  TGetDetailArticle,
+  TUpdateArticle,
 } from '../types/response';
 import {
   User,
@@ -27,6 +32,9 @@ import {
   JournalHistoryParams,
   Music,
   MusicAllData,
+  GetPsychologParams,
+  GetArticleParams,
+  Article,
 } from '../types/types';
 import { capitalizeFirstLetter } from './formatTextFunction';
 import { isSevere, selfScreeningGetterFunction } from './selfScreeningFunction';
@@ -57,16 +65,30 @@ export const emailIsNotVerifiedResponse = () => defaultResponse(false, 'VALIDATI
 export const existedUserResponse = () => defaultResponse(false, 'VALIDATION.EXISTEDUSER');
 export const existedDataResponse = (title: string) => defaultResponse(false, 'VALIDATION.EXISTEDDATA', 'FIELD', title);
 export const passwordDoNotMatch = () => defaultResponse(false, 'VALIDATION.PASSWORDSDONOTMATCH');
+export const accountIsNotApprovedResponse = () => defaultResponse(false, 'VALIDATION.USERISNOTAPPROVED');
 export const forbiddenAccessResponse = () => defaultResponse(false, 'ERRORRESPONSE.FORBIDDENACCESS');
+
+export const psychologAlreadyApprovedResponse = (name: string) =>
+  defaultResponse(false, 'VALIDATION.PSCHOLOGALREADYAPPROVED', 'NAME', capitalCase(name));
+
 export const isNotAllowedSeenJournalResponse = (user: string) =>
   defaultResponse(false, 'VALIDATION.USERNOTALLOWEDSEENJOURNAL', 'USER', user);
+
 export const nameNotFoundResponse = (username_or_fullname: string) =>
-  defaultResponse(false, 'ERRORRESPONSE.IDNOTFOUND', 'NAME', username_or_fullname);
+  defaultResponse(false, 'ERRORRESPONSE.NAMENOTFOUND', 'NAME', username_or_fullname);
 
 export const sendEmaiResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.SENDEMAILVERIFICATION');
 export const verifyEmailResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL');
 export const forgotPasswordResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.FORGOTPASSWORD');
 export const resetPasswordResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.RESETPASSWORD');
+export const getUserRoleResponse = (role: string) => defaultResponse(true, role);
+export const deleteMusicResponse = (id: string) => defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', id);
+export const deleteArticleResponse = (id: string) =>
+  defaultResponse(true, 'SUCCESSRESPONSE.DELETEARTICLEDATA', 'ID', id);
+export const approvePsychologResponse = (name: string) =>
+  defaultResponse(true, 'SUCCESSRESPONSE.APPROVEPSYCHOLOG', 'NAME', capitalCase(name));
+export const deletePsychologResponse = (name: string) =>
+  defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', capitalCase(name));
 
 export const createUserResponse = (userData: User): TCreateUser => {
   const newUserData = {
@@ -298,9 +320,15 @@ export const getJournalDetailResponse = (journalData: JournalData): TGetJournalH
 
 export const createMusicResponse = (musicData: Music): TCreateMusic => {
   const data = {
+    id: musicData.id,
+    title: musicData.title,
+    author: musicData.author,
+    genre: musicData.genre,
+    music_link: musicData.music_link,
+    created_by: musicData.user?.full_name,
     created_date: musicData.created_at_formatted,
+    updated_by: musicData.modifiedUser?.full_name,
     updated_date: musicData.modified_at_formatted,
-    ...musicData,
   };
   return {
     ...defaultResponse(true, 'SUCCESSRESPONSE.CREATEMUSIC'),
@@ -311,11 +339,15 @@ export const createMusicResponse = (musicData: Music): TCreateMusic => {
 export const getMusicResponse = (musicAllData: MusicAllData, getQueryPayload: Partial<getQueryPayload>): TGetMusic => {
   const { page } = getQueryPayload;
   const data = musicAllData.data.map((data) => ({
+    id: data.id,
+    title: data.title,
+    author: data.author,
+    genre: data.genre,
+    music_link: data.music_link,
     created_by: data.user?.full_name,
     created_date: data.created_at_formatted,
     updated_by: data.modifiedUser?.full_name,
     updated_date: data.modified_at_formatted,
-    ...data,
   }));
   const totalItems = musicAllData.totalCount;
   const sizeData = data.length;
@@ -335,11 +367,15 @@ export const getMusicResponse = (musicAllData: MusicAllData, getQueryPayload: Pa
 
 export const getDetailMusicResponse = (musicData: Music): TGetMusicDetail => {
   const data = {
+    id: musicData.id,
+    title: musicData.title,
+    author: musicData.author,
+    genre: musicData.genre,
+    music_link: musicData.music_link,
     created_by: musicData.user?.full_name,
     created_date: musicData.created_at_formatted,
     updated_by: musicData.modifiedUser?.full_name,
     updated_date: musicData.modified_at_formatted,
-    ...musicData,
   };
   return {
     ...defaultResponse(true, 'SUCCESSRESPONSE.GETDETAILMUSICDATA', 'ID', data.id),
@@ -349,11 +385,15 @@ export const getDetailMusicResponse = (musicData: Music): TGetMusicDetail => {
 
 export const updateMusicResponse = (musicData: Music): TUpdateMusic => {
   const data = {
+    id: musicData.id,
+    title: musicData.title,
+    author: musicData.author,
+    genre: musicData.genre,
+    music_link: musicData.music_link,
     created_by: musicData.user?.full_name,
     created_date: musicData.created_at_formatted,
     updated_by: musicData.modifiedUser?.full_name,
     updated_date: musicData.modified_at_formatted,
-    ...musicData,
   };
   return {
     ...defaultResponse(true, 'SUCCESSRESPONSE.UPDATEMUSICDATA', 'ID', data.id),
@@ -361,7 +401,121 @@ export const updateMusicResponse = (musicData: Music): TUpdateMusic => {
   };
 };
 
-export const deleteMusicResponse = (id: string) => defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', id);
+export const getPsychologResponse = (
+  pschologData: GetPsychologParams,
+  getQueryPayload: Partial<getQueryPayload>,
+): TGetPsycholog => {
+  const { page } = getQueryPayload;
+  const data = pschologData.data.map((data) => ({
+    id: data.id,
+    full_name: capitalCase(data.full_name),
+    email: data.email,
+    age: data.age,
+    is_approved: data.is_approved,
+    last_logged_in: data.last_logged_in_formatted,
+    created_date: data.created_at_formatted,
+  }));
+  const totalItems = pschologData.totalCount;
+  const sizeData = data.length;
+  const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
+  const getResponseProps = {
+    size: sizeData,
+    page: page ?? 1,
+    total_items: totalItems,
+    total_pages: totalPages,
+  };
+  return {
+    ...getResponseProps,
+    data,
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETPSYCHOLOGDATA'),
+  };
+};
+
+export const createArticleResponse = (articleData: Article): TCreateArticle => {
+  const data = {
+    id: articleData.id,
+    title: articleData.title,
+    image: articleData.image,
+    content: articleData.content,
+    article_type: articleData.article_type,
+    created_by: articleData.user?.full_name,
+    created_date: articleData.created_at_formatted,
+    updated_by: articleData.modifiedUser?.full_name,
+    updated_date: articleData.modified_at_formatted,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.CREATEARTICLE'),
+    data,
+  };
+};
+
+export const getArticleResponse = (
+  articleDataParams: GetArticleParams,
+  getQueryPayload: Partial<getQueryPayload>,
+): TGetArticle => {
+  const { page } = getQueryPayload;
+  const data = articleDataParams.data.map((data) => ({
+    id: data.id,
+    title: data.title,
+    image: data.image,
+    content: data.content,
+    article_type: data.article_type,
+    created_by: data.user?.full_name,
+    created_date: data.created_at_formatted,
+    updated_by: data.modifiedUser?.full_name,
+    updated_date: data.modified_at_formatted,
+  }));
+  const totalItems = articleDataParams.totalCount;
+  const sizeData = data.length;
+  const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
+  const getResponseProps = {
+    size: sizeData,
+    page: page ?? 1,
+    total_items: totalItems,
+    total_pages: totalPages,
+  };
+  return {
+    ...getResponseProps,
+    data,
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETARTICLEDATA'),
+  };
+};
+
+export const getArticleDetailResponse = (articleData: Article): TGetDetailArticle => {
+  const data = {
+    id: articleData.id,
+    title: articleData.title,
+    image: articleData.image,
+    content: articleData.content,
+    article_type: articleData.article_type,
+    created_by: articleData.user?.full_name,
+    created_date: articleData.created_at_formatted,
+    updated_by: articleData.modifiedUser?.full_name,
+    updated_date: articleData.modified_at_formatted,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.GETDETAILARTICLEDATA', 'ID', data.id),
+    data,
+  };
+};
+
+export const updateArticleResponse = (articleData: Article): TUpdateArticle => {
+  const data = {
+    id: articleData.id,
+    title: articleData.title,
+    image: articleData.image,
+    content: articleData.content,
+    article_type: articleData.article_type,
+    created_by: articleData.user?.full_name,
+    created_date: articleData.created_at_formatted,
+    updated_by: articleData.modifiedUser?.full_name,
+    updated_date: articleData.modified_at_formatted,
+  };
+  return {
+    ...defaultResponse(true, 'SUCCESSRESPONSE.UPDATEARTICLEDATA', 'ID', data.id),
+    data,
+  };
+};
 
 export const handleErrorEmptyDataResponse = (getQueryPayload: Partial<getQueryPayload>): TSelfScreeningHistory => ({
   page: getQueryPayload.page ?? 1,

@@ -18,7 +18,7 @@ const createMusic = async (req: Request, res: Response) => {
     const createdMusic = await MusicService.createMusic(req.body as createMusicPayload, req.user!.id);
     return res.status(200).json(createMusicResponse(createdMusic));
   } catch (error) {
-    console.log('error create music', error);
+    console.error('error create music', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -30,7 +30,7 @@ const getMusic = async (req: Request, res: Response) => {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientValidationError)
       return res.status(200).json(handleErrorEmptyDataResponse(req.body as getQueryPayload));
-    console.log('error get music', error);
+    console.error('error get music', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -42,7 +42,7 @@ const getDetailMusic = async (req: Request, res: Response) => {
     if (!foundMusic) return res.status(404).json(idNotFoundResponse(id));
     res.status(200).json(getDetailMusicResponse(foundMusic));
   } catch (error) {
-    console.log('error get detail music', error);
+    console.error('error get detail music', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -55,7 +55,7 @@ const updateMusic = async (req: Request, res: Response) => {
     const updateMusic = await MusicService.updateMusic(req.body as updateMusicPayload, foundMusic, req.user!.id);
     res.status(200).json(updateMusicResponse(updateMusic));
   } catch (error) {
-    console.log('error update music', error);
+    console.error('error update music', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -68,7 +68,7 @@ const deleteMusic = async (req: Request, res: Response) => {
     const deletedMusic = await MusicService.deleteMusicById(foundMusic.id, foundMusic.music_link);
     res.status(200).json(deleteMusicResponse(deletedMusic.id));
   } catch (error) {
-    console.log('error delete music', error);
+    console.error('error delete music', error);
     return res.status(500).json(serverErrorResponse());
   }
 };

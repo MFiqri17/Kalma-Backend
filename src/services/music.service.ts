@@ -4,8 +4,6 @@ import { deleteFromCloudinary, uploadToCloudinary } from '../utils/functions/fil
 import { createMusicPayload, getQueryPayload, updateMusicPayload } from '../utils/types/payload';
 import { Music } from '../utils/types/types';
 
-const getMusicByTitle = (title: string) => MusicData.getMusicByTitle(title);
-
 const createMusic = async (musicPayload: createMusicPayload, userId: string) => {
   const music_url = musicPayload.music_file
     ? (await uploadToCloudinary(musicPayload.music_file.buffer, musicPayload.music_file.mimetype)).secure_url
@@ -29,7 +27,7 @@ const updateMusic = async (musicPayload: updateMusicPayload, musicFound: Music, 
 };
 
 const getMusic = async (getPayload?: Partial<getQueryPayload>) => {
-  if (getPayload) {
+  if (getPayload && Object.keys(getPayload).length > 0) {
     const allColumns = ['title', 'author', 'genre', 'created_at_formatted', 'modified_at_formatted'];
     const whereCondition = getWhereConditionFunction(getPayload, allColumns);
     const [totalCount, data] = await Promise.all([
@@ -52,7 +50,6 @@ const deleteMusicById = async (musicId: string, musicLink: string) => {
 };
 
 const MusicService = {
-  getMusicByTitle,
   createMusic,
   updateMusic,
   getMusic,

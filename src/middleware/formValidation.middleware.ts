@@ -7,13 +7,11 @@ const formValidationMiddleware = (schema: ZodTypeAny) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const bodyRequest = req.file ? { [req.file.fieldname]: req.file, ...req.body } : req.body;
-      console.log(bodyRequest);
       const validateData = schema.parse(bodyRequest);
       req.body = validateData;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        console.log(error.errors);
         return res.status(400).json(payloadValidationResponse(error));
       } else {
         console.error('Error validating request:', error);

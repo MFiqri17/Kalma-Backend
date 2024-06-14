@@ -3,6 +3,7 @@ import UserService from '../services/user.service';
 import jwt, { Secret } from 'jsonwebtoken';
 import { User } from '../utils/types/types';
 import {
+  accountIsNotApprovedResponse,
   emailIsNotVerifiedResponse,
   existedUserResponse,
   forbiddenAccessResponse,
@@ -29,10 +30,22 @@ const isUserEmailVerified = async (req: Request, res: Response, next: NextFuncti
   try {
     const user = await UserService.getUserById(req.user!.id);
     const isEmailVerified = UserService.isEmailVerified(user!.is_verified);
-    if (!isEmailVerified) return res.status(403).json(emailIsNotVerifiedResponse());
+    if (!isEmailVerified) return res.status(400).json(emailIsNotVerifiedResponse());
     next();
   } catch (error) {
     console.error('Error checking verified email:', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const isAccountApproved = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await UserService.getUserById(req.user!.id);
+    const role = ['admin', 'psychologist'];
+    if (!user?.is_approved && role.includes(user!.role)) return res.status(403).json(accountIsNotApprovedResponse());
+    next();
+  } catch (error) {
+    console.error('Error checking approved account:', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -75,6 +88,7 @@ const checkUserRole = (userRole: USER_ROLE[]) => {
 const UserMiddleware = {
   checkExistingUser,
   isUserEmailVerified,
+  isAccountApproved,
   verifyEmailVerificationToken,
   verifyForgotPasswordToken,
   checkUserRole,

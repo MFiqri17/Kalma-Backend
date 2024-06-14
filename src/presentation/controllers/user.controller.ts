@@ -17,10 +17,16 @@ import {
   passwordDoNotMatch,
   resetPasswordResponse,
   idNotFoundResponse,
+  getUserRoleResponse,
+  getPsychologResponse,
+  psychologAlreadyApprovedResponse,
+  approvePsychologResponse,
+  deletePsychologResponse,
 } from '../../utils/functions/responseFunction';
 import {
   createUserPayload,
   forgotPasswordPayload,
+  getQueryPayload,
   resetPasswordPayload,
   updateUserPayload,
 } from '../../utils/types/payload';
@@ -37,27 +43,13 @@ const createUser = async (req: Request, res: Response) => {
       full_name: lowerCaseName,
       password: hashedPassword,
     };
-    const newUser = await UserService.createUser(userPayload);
-    const verificationToken = generateToken(newUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-    EmailService.verificationEmail(newUser, verificationToken, PATH.VERIFICATION_EMAIL);
-    return res.status(201).json(createUserResponse(newUser));
-  } catch (error) {
-    console.error('Error creating user:', error);
-    return res.status(500).json(serverErrorResponse());
-  }
-};
-
-const createPsycholog = async (req: Request, res: Response) => {
-  try {
-    const { password, full_name, ...restBodyRequest } = req.body as createUserPayload;
-    const hashedPassword = await AuthService.hashPassword(password);
-    const lowerCaseName = lowerCase(full_name);
-    const userPayload = {
-      ...restBodyRequest,
-      role: 'psychologist',
-      full_name: lowerCaseName,
-      password: hashedPassword,
-    };
+    const origin = req.get('origin');
+    if (origin && origin === process.env.WEB_APP_BASE_LOCAL) {
+      const newPsycholog = await UserService.createPsycholog(userPayload);
+      const verificationToken = generateToken(newPsycholog, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
+      EmailService.verificationEmail(newPsycholog, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
+      return res.status(201).json(createUserResponse(newPsycholog));
+    }
     const newUser = await UserService.createUser(userPayload);
     const verificationToken = generateToken(newUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
     EmailService.verificationEmail(newUser, verificationToken, PATH.VERIFICATION_EMAIL);
@@ -74,7 +66,18 @@ const getUserProperty = async (req: Request, res: Response) => {
     if (!user) return res.status(404).json(idNotFoundResponse(req.user!.id));
     return res.status(200).json(getUserResponse(user));
   } catch (error) {
-    console.log('Error get user property', error);
+    console.error('Error get user property', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const getUserRole = async (req: Request, res: Response) => {
+  try {
+    const user = await UserService.getUserById(req.user!.id);
+    if (!user) return res.status(404).json(idNotFoundResponse(req.user!.id));
+    return res.status(200).json(getUserRoleResponse(user.role));
+  } catch (error) {
+    console.error('Error get user role', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -100,7 +103,7 @@ const updateUserProperty = async (req: Request, res: Response) => {
     }
     return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
   } catch (error) {
-    console.log('Error update user property', error);
+    console.error('Error update user property', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -114,7 +117,7 @@ const sendEmailVerification = async (req: Request, res: Response) => {
     EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
     return res.status(200).json(sendEmaiResponse());
   } catch (error) {
-    console.log('Error send email verification', error);
+    console.error('Error send email verification', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -124,10 +127,11 @@ const verifyEmail = async (req: Request, res: Response) => {
     const user = await UserService.getUserById(req.user!.id);
     const isEmailVerified = UserService.isEmailVerified(user!.is_verified);
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
-    await UserService.verifyUserById(user!.id);
+    const verifiedUser = await UserService.verifyUserById(user!.id);
+    if (verifiedUser.role === 'psychologist') EmailService.waitingForApprovalEmail(verifiedUser);
     return res.status(200).json(verifyEmailResponse());
   } catch (error) {
-    console.log('Error verify email', error);
+    console.error('Error verify email', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -142,7 +146,7 @@ const forgotPassword = async (req: Request, res: Response) => {
     EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
     return res.status(200).json(forgotPasswordResponse());
   } catch (error) {
-    console.log('Error forgot password', error);
+    console.error('Error forgot password', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -157,20 +161,61 @@ const resetPassword = async (req: Request, res: Response) => {
     await UserService.resetPasswordById(req.user!.id, hashedPassword);
     return res.status(200).json(resetPasswordResponse());
   } catch (error) {
-    console.log('Error reset password', error);
+    console.error('Error reset password', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const getPsycholog = async (req: Request, res: Response) => {
+  try {
+    const user = await UserService.getPscycholog(req.body as getQueryPayload);
+    return res.status(200).json(getPsychologResponse(user, req.body as getQueryPayload));
+  } catch (error) {
+    console.error('Error get psycholog', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const approvePsycholog = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const foundPsycholog = await UserService.getUserById(id);
+    if (!foundPsycholog) return res.status(404).json(idNotFoundResponse(id));
+    if (foundPsycholog.is_approved)
+      return res.status(400).json(psychologAlreadyApprovedResponse(foundPsycholog.full_name));
+    const approvedPsycholog = await UserService.approvePsycholog(id);
+    return res.status(200).json(approvePsychologResponse(approvedPsycholog.full_name));
+  } catch (error) {
+    console.error('Error approve psycholog', error);
+    return res.status(500).json(serverErrorResponse());
+  }
+};
+
+const deletePsycholog = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const foundPsycholog = await UserService.getUserById(id);
+    if (!foundPsycholog) return res.status(404).json(idNotFoundResponse(id));
+    const deletedPsycholog = await UserService.deletePsycholog(id);
+    return res.status(200).json(deletePsychologResponse(deletedPsycholog.full_name));
+  } catch (error) {
+    console.error('Error delete psycholog', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
 
 const UserController = {
   createUser,
-  createPsycholog,
   getUserProperty,
+  getUserRole,
   updateUserProperty,
   sendEmailVerification,
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getPsycholog,
+  approvePsycholog,
+  deletePsycholog,
 };
 
 export default UserController;

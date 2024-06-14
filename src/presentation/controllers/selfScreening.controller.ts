@@ -18,7 +18,7 @@ const createSelfScreening = async (req: Request, res: Response) => {
     const createdSelfScreening = await SelfScreeningService.createSelfScreening(formatedPayload, req.user!.id);
     return res.status(200).json(selfScreeningTestResponse(createdSelfScreening));
   } catch (error) {
-    console.log('error create self screening', error);
+    console.error('error create self screening', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -33,7 +33,7 @@ const getSelfScreeningHistory = async (req: Request, res: Response) => {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientValidationError)
       return res.status(200).json(handleErrorEmptyDataResponse(req.body as getQueryPayload));
-    console.log('error get self screening history', error);
+    console.error('error get self screening history', error);
     return res.status(500).json(serverErrorResponse());
   }
 };
@@ -45,7 +45,7 @@ const getDetailSelfScreeningHistory = async (req: Request, res: Response) => {
     if (!selfScreeningDetailHistory) return res.status(404).json(idNotFoundResponse(id));
     return res.status(200).json(selfScreeningHistoryDetailResponse(selfScreeningDetailHistory));
   } catch (error) {
-    console.log('error get self screening history detail', error);
+    console.error('error get self screening history detail', error);
     return res.status(500).json(serverErrorResponse());
   }
 };

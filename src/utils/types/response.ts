@@ -27,6 +27,16 @@ export type TGetUserData = {
   last_logged_in: string | null;
 };
 
+export type TGetPsychologData = {
+  id: string;
+  full_name: string;
+  email: string;
+  age: number;
+  is_approved: boolean;
+  last_logged_in: string | null;
+  created_date: string;
+};
+
 export type TUpdateUserData = {
   username: string;
   full_name: string;
@@ -53,6 +63,11 @@ export type TCreateUser = TDefault & {
 export type TGetUser = TDefault & {
   data: TGetUserData;
 };
+
+export type TGetPsycholog = TDefault &
+  TGetResponseDefault & {
+    data: TGetPsychologData[];
+  };
 
 export type TUpdateUser = TDefault & {
   is_email_changed: boolean;
@@ -142,4 +157,33 @@ export type TGetMusicDetail = TDefault & {
 
 export type TUpdateMusic = TDefault & {
   data: TMusicData;
+};
+
+export type TArticleData = {
+  id: string;
+  title: string;
+  image: string | null;
+  content: string[];
+  article_type: string[];
+  created_by?: string;
+  created_date: string;
+  updated_by?: string;
+  updated_date: string;
+};
+
+export type TCreateArticle = TDefault & {
+  data: TArticleData;
+};
+
+export type TUpdateArticle = TDefault & {
+  data: TArticleData;
+};
+
+export type TGetArticle = TDefault &
+  TGetResponseDefault & {
+    data: TArticleData[];
+  };
+
+export type TGetDetailArticle = TDefault & {
+  data: TArticleData;
 };

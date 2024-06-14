@@ -14,6 +14,8 @@ import SelfScreeningRouter from './src/presentation/routes/selfScreening.route';
 import UserRouter from './src/presentation/routes/user.route';
 import JournalingRouter from './src/presentation/routes/journaling.route';
 import MusicRouter from './src/presentation/routes/music.route';
+import UserManagementRouter from './src/presentation/routes/userManagement.route';
+import ArticleRouter from './src/presentation/routes/article.route';
 
 declare module 'express' {
   interface Request {
@@ -30,7 +32,7 @@ void i18next.use(Backend).init({
     skipOnVariables: false,
   },
   backend: {
-    loadPath: path.join(__dirname, 'locales/{{lng}}/{{ns}}.json'),
+    loadPath: path.join(__dirname, 'public/locales/{{lng}}/{{ns}}.json'),
   },
 });
 
@@ -53,9 +55,11 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(ENDPOINTS.GENERAL, UserRouter);
+app.use(ENDPOINTS.USER_MANAGEMENT, UserManagementRouter);
 app.use(ENDPOINTS.SELF_SCREENING, SelfScreeningRouter);
 app.use(ENDPOINTS.JOURNALING, JournalingRouter);
 app.use(ENDPOINTS.MUSICMEDITATION, MusicRouter);
+app.use(ENDPOINTS.ARTICLE, ArticleRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running in PORT ${PORT}`);

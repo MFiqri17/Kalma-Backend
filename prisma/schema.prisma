@@ -62,7 +62,7 @@ model Screenings {
 
 model MusicMeditations {
   id                    String   @id @default(uuid())
-  title                 String   @unique
+  title                 String
   author                String?
   genre                 String
   music_link            String
@@ -89,8 +89,9 @@ model Journals {
 
 model Articles {
   id                    String   @id @default(uuid())
-  title                 String   @unique
-  content               Json
+  title                 String
+  image                 String?
+  content               String[]
   article_type          String[]
   created_at            DateTime @default(now())
   created_at_formatted  String

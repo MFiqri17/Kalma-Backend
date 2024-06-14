@@ -3,8 +3,6 @@ import { getFormatDate } from '../utils/functions/conditionFunctions';
 import { createMusicPayload, getQueryPayload, updateMusicPayload } from '../utils/types/payload';
 import prisma from './prisma';
 
-const getMusicByTitle = (title: string) => prisma.musicMeditations.findUnique({ where: { title: title } });
-
 const createMusic = (musicPayload: createMusicPayload, musicUrl: string, userId: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { music_file, music_link, title, ...restData } = musicPayload;
@@ -65,7 +63,7 @@ const getMusicWithoutCondition = () =>
 const getMusicTotalWithoutCondition = () => prisma.musicMeditations.count();
 
 const getMusicTotal = (whereCondition: object) =>
-  prisma.journals.count({
+  prisma.musicMeditations.count({
     where: whereCondition,
   });
 
@@ -100,11 +98,32 @@ const getMusic = async (whereCondition: object, getPayload: Partial<getQueryPayl
   });
 };
 
-const getMusicById = (musicId: string) => prisma.musicMeditations.findUnique({ where: { id: musicId } });
+const getMusicById = (musicId: string) =>
+  prisma.musicMeditations.findUnique({
+    where: { id: musicId },
+    select: {
+      id: true,
+      title: true,
+      author: true,
+      genre: true,
+      music_link: true,
+      created_at_formatted: true,
+      modified_at_formatted: true,
+      user: {
+        select: {
+          full_name: true,
+        },
+      },
+      modifiedUser: {
+        select: {
+          full_name: true,
+        },
+      },
+    },
+  });
 const deleteMusicById = (musicId: string) => prisma.musicMeditations.delete({ where: { id: musicId } });
 
 const MusicData = {
-  getMusicByTitle,
   createMusic,
   updateMusic,
   getMusicWithoutCondition,

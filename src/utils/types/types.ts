@@ -12,6 +12,7 @@ export type User = {
   role: USER_ROLE;
   allow_journal: boolean;
   is_verified: boolean;
+  is_approved: boolean;
   last_logged_in: Date | null;
   last_logged_in_formatted: string | null;
   created_at: Date;
@@ -42,6 +43,18 @@ export type Music = {
   modified_at_formatted: string;
 };
 
+export type Article = {
+  id: string;
+  title: string;
+  image: string | null;
+  content: string[];
+  article_type: string[];
+  user?: Pick<User, 'full_name'> | null;
+  modifiedUser?: Pick<User, 'full_name'> | null;
+  created_at_formatted: string;
+  modified_at_formatted: string;
+};
+
 export type SelfScreeningHistoryParams = {
   data: SelfScreeningData[];
   totalCount: number;
@@ -60,5 +73,15 @@ export type JournalHistoryParams = {
 
 export type MusicAllData = {
   data: Music[];
+  totalCount: number;
+};
+
+export type GetPsychologParams = {
+  data: User[];
+  totalCount: number;
+};
+
+export type GetArticleParams = {
+  data: Article[];
   totalCount: number;
 };

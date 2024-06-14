@@ -1,5 +1,5 @@
 import prisma from './prisma';
-import { createUserPayload, updateUserPayload } from '../utils/types/payload';
+import { createUserPayload, getQueryPayload, updateUserPayload } from '../utils/types/payload';
 import { getFormatDate } from '../utils/functions/conditionFunctions';
 import { lowerCase } from 'text-case';
 
@@ -12,6 +12,21 @@ const createUser = (userData: createUserPayload, avatar_url?: string) => {
       created_at_formatted: getFormatDate('MMMM Do YYYY, HH:mm:ss'),
       avatar_link: avatar_url,
       age: Number(age),
+      ...restData,
+    },
+  });
+};
+
+const createPsycholog = (userData: createUserPayload, avatar_url?: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { age, avatar, ...restData } = userData;
+  return prisma.users.create({
+    data: {
+      created_at: getFormatDate(),
+      created_at_formatted: getFormatDate('MMMM Do YYYY, HH:mm:ss'),
+      avatar_link: avatar_url,
+      age: Number(age),
+      role: 'psychologist',
       ...restData,
     },
   });
@@ -59,8 +74,60 @@ const verifyUserById = (id: string) => prisma.users.update({ where: { id }, data
 
 const unverifyUserById = (id: string) => prisma.users.update({ where: { id }, data: { is_verified: false } });
 
+const getPsychologTotalDataWithoutCondition = () =>
+  prisma.users.count({
+    where: {
+      role: 'psychologist',
+      is_verified: true,
+    },
+  });
+
+const getPsychologDataWithoutCondition = () => {
+  return prisma.users.findMany({
+    where: { role: 'psychologist', is_verified: true },
+    orderBy: {
+      is_approved: 'desc',
+    },
+  });
+};
+
+const getPsychologTotalData = (whereCondition: object) =>
+  prisma.users.count({
+    where: {
+      AND: [{ role: 'psychologist', is_verified: true }, whereCondition],
+    },
+  });
+
+const getPsychologData = async (whereCondition: object, getPayload: Partial<getQueryPayload>) => {
+  const { sort_column, sort_value, size, page } = getPayload;
+  return prisma.users.findMany({
+    where: {
+      AND: [{ role: 'psychologist', is_verified: true }, whereCondition],
+    },
+    orderBy: {
+      [sort_column || 'is_approved']: sort_value || 'desc',
+    },
+    skip: page && size ? (page - 1) * size : 0,
+    take: size || (await getPsychologTotalData(whereCondition)),
+  });
+};
+
+const approvePsycholog = (user_id: string) =>
+  prisma.users.update({
+    where: { id: user_id, role: 'psychologist', is_verified: true },
+    data: {
+      is_approved: true,
+    },
+  });
+
+const deletePsycholog = (user_id: string) =>
+  prisma.users.delete({
+    where: { id: user_id, role: 'psychologist' },
+  });
+
 const UserData = {
   createUser,
+  createPsycholog,
   getUserByEmailOrUsernameOneParams,
   getUserByEmailOrUsernameTwoParams,
   getUserByUsernameOrFullName,
@@ -72,6 +139,12 @@ const UserData = {
   updateLastLoggedInById,
   verifyUserById,
   unverifyUserById,
+  getPsychologTotalDataWithoutCondition,
+  getPsychologDataWithoutCondition,
+  getPsychologTotalData,
+  getPsychologData,
+  approvePsycholog,
+  deletePsycholog,
 };
 
 export default UserData;

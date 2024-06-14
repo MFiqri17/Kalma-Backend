@@ -1,6 +1,72 @@
 import moment from 'moment';
 import { getQueryPayload } from '../types/payload';
 import REGEX from '../constant/regex';
+import { lowerCase } from 'text-case';
+
+export const getArticleWhereConditionFunction = (getPayload: Partial<getQueryPayload>): object => {
+  const { search_value, search_column } = getPayload;
+  if (getPayload && search_value) {
+    const arrayColumn = ['content', 'article_type'];
+    if (search_column) {
+      if (arrayColumn.includes(search_column))
+        return {
+          [search_column]: {
+            has: lowerCase(search_value),
+          },
+        };
+      else if (search_column === 'user')
+        return {
+          user: {
+            full_name: {
+              contains: lowerCase(search_value),
+            },
+          },
+        };
+      else
+        return {
+          [search_column]: {
+            contains: lowerCase(search_value),
+          },
+        };
+    }
+    return {
+      OR: [
+        { title: { contains: lowerCase(search_value), mode: 'insensitive' } },
+        {
+          content: {
+            has: lowerCase(search_value),
+          },
+        },
+        {
+          article_type: {
+            has: lowerCase(search_value),
+          },
+        },
+        {
+          user: {
+            full_name: {
+              contains: lowerCase(search_value),
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          created_at_formatted: {
+            contains: lowerCase(search_value),
+            mode: 'insensitive',
+          },
+        },
+        {
+          modified_at_formatted: {
+            contains: lowerCase(search_value),
+            mode: 'insensitive',
+          },
+        },
+      ],
+    };
+  }
+  return {};
+};
 
 export const getWhereConditionFunction = (getPayload: Partial<getQueryPayload>, allColumns?: string[]): object => {
   const { search_value, search_column, filter_column, filter_value } = getPayload;

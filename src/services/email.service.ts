@@ -13,11 +13,15 @@ const verificationEmailAgain = (user: Pick<User, 'username' | 'email'>, token: s
 const forgotPasswordEmail = (user: Pick<User, 'username' | 'email'>, token: string, link: string) =>
   sendEmail(user, 'EMAILRESPONSE.FORGOTPASSWORDEMAIL', true, link, token);
 
+const waitingForApprovalEmail = (user: Pick<User, 'username' | 'email'>) =>
+  sendEmail(user, 'EMAILRESPONSE.WAITINGFORAPPROVALEMAIL', false);
+
 const EmailService = {
   verificationEmail,
   verificationEmailChanged,
   verificationEmailAgain,
   forgotPasswordEmail,
+  waitingForApprovalEmail,
 };
 
 export default EmailService;

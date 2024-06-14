@@ -42,7 +42,7 @@ export const createMusicSchema = z
     message: requiredMessage,
     path: ['music'],
   })
-  .refine((data) => !data.music_link && !data.music_file, {
+  .refine((data) => !(data.music_link && data.music_file), {
     message: musicCantBeBothMessage,
     path: ['music'],
   });
@@ -72,7 +72,7 @@ export const updateMusicSchema = z
       .refine((file) => file && file.mimetype.startsWith('audio/'), invalidAudioFormat)
       .optional(),
   })
-  .refine((data) => !data.music_link && !data.music_file, {
+  .refine((data) => !(data.music_link && data.music_file), {
     message: musicCantBeBothMessage,
     path: ['music'],
   });

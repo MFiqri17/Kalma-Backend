@@ -1,11 +1,14 @@
 const ENDPOINTS = {
   GENERAL: '/api/user',
+  USER_MANAGEMENT: '/api/user-management',
   SELF_SCREENING: '/api/self-screening',
   JOURNALING: '/api/self-management/journals',
   MUSICMEDITATION: '/api/self-management/music-meditation',
+  ARTICLE: '/api/article',
   LOGIN: '/authenticate',
   REGISTER: '/register',
   GET_USER_PROPERTY: '/user-property',
+  GET_USER_ROLE: '/user-role',
   UPDATE_USER_PROPERTY: '/user-property/update',
   REFRESH_TOKEN: '/refresh-token',
   SEND_VERIFICATION_EMAIL: '/send-email-verification',
@@ -17,6 +20,8 @@ const ENDPOINTS = {
   USERS_JOURNAL: '/users-journal',
   JOURNALS_BY_USER: '/journals-by-user',
   CREATE_JOURNAL: '/create',
+  APPROVE_PSYCHOLOG: '/approve',
+  DELETE_PSYCHOLOG: '/delete',
 } as const;
 
 export default ENDPOINTS;

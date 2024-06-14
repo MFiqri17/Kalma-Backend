@@ -13,19 +13,24 @@ const JournalingRouter = Router();
 JournalingRouter.post(
   ENDPOINTS.USERS_JOURNAL,
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),
   formValidationMiddleware(createJournal),
   JournalingController.createJournal,
 );
+
 JournalingRouter.get(
   ENDPOINTS.USERS_JOURNAL,
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),
   JournalingController.getJournalHistory,
 );
+
 JournalingRouter.get(
   ENDPOINTS.USERS_JOURNAL + '/:id',
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),
   JournalingController.getJournalDetailHistory,
 );
@@ -34,15 +39,19 @@ JournalingRouter.get(
 JournalingRouter.get(
   ENDPOINTS.JOURNALS_BY_USER + '/:username_or_fullname',
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['psychologist']),
+  UserMiddleware.isAccountApproved,
   JournalingController.getUserJournalForPsychologist,
 );
 
 JournalingRouter.get(
   ENDPOINTS.JOURNALS_BY_USER + '/:username_or_fullname' + '/:id',
   AuthMiddleware.verifyAccessToken,
+  UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['psychologist']),
-  JournalingController.getUserJournalForPsychologist,
+  UserMiddleware.isAccountApproved,
+  JournalingController.getUserJournalDetailForPsychologist,
 );
 
 export default JournalingRouter;
