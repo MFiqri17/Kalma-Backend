@@ -39,6 +39,12 @@ void i18next.use(Backend).init({
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    callback(null, true);
+  },
+  credentials: true,
+};
 
 app.use(i18nextMiddleware.handle(i18next));
 app.use((req, res, next) => {
@@ -47,7 +53,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
