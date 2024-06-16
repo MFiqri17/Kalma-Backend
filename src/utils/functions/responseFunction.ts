@@ -23,6 +23,7 @@ import {
   TGetArticle,
   TGetDetailArticle,
   TUpdateArticle,
+  TBadRequestErrorResponse,
 } from '../types/response';
 import {
   User,
@@ -54,29 +55,90 @@ export const defaultResponse = (
   message: capitalizeFirstLetter(t(message, { [field!]: fieldValue })),
 });
 
+//500
 export const serverErrorResponse = () => defaultResponse(false, 'ERRORRESPONSE.INTERNALSERVERERROR');
+
+//404
 export const idNotFoundResponse = (id: string) => defaultResponse(false, 'ERRORRESPONSE.IDNOTFOUND', 'ID', id);
-export const invalidCredentialResponse = () => defaultResponse(false, 'VALIDATION.WRONGCREDENTIALS');
+
+//401
 export const invalidAccessTokenResponse = () => defaultResponse(false, 'VALIDATION.INVALIDACCESSTOKEN');
 export const invalidRefreshTokenResponse = () => defaultResponse(false, 'VALIDATION.INVALIDREFRESHTOKEN');
-export const invalidLinkTokenResponse = () => defaultResponse(false, 'VALIDATION.LINKTOKENINVALID');
-export const emailIsVerifiedResponse = () => defaultResponse(false, 'VALIDATION.EMAILISVERIFIED');
-export const emailIsNotVerifiedResponse = () => defaultResponse(false, 'VALIDATION.EMAILISNOTVERIFIED');
-export const existedUserResponse = () => defaultResponse(false, 'VALIDATION.EXISTEDUSER');
-export const existedDataResponse = (title: string) => defaultResponse(false, 'VALIDATION.EXISTEDDATA', 'FIELD', title);
-export const passwordDoNotMatch = () => defaultResponse(false, 'VALIDATION.PASSWORDSDONOTMATCH');
-export const accountIsNotApprovedResponse = () => defaultResponse(false, 'VALIDATION.USERISNOTAPPROVED');
+
+//403
 export const forbiddenAccessResponse = () => defaultResponse(false, 'ERRORRESPONSE.FORBIDDENACCESS');
 
-export const psychologAlreadyApprovedResponse = (name: string) =>
-  defaultResponse(false, 'VALIDATION.PSCHOLOGALREADYAPPROVED', 'NAME', capitalCase(name));
+//400
+export const emailIsNotVerifiedResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.EMAILISNOTVERIFIED'),
+  type: 'email',
+});
 
-export const isNotAllowedSeenJournalResponse = (user: string) =>
-  defaultResponse(false, 'VALIDATION.USERNOTALLOWEDSEENJOURNAL', 'USER', user);
+export const accountIsNotApprovedResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.USERISNOTAPPROVED'),
+  type: 'approve',
+});
 
-export const nameNotFoundResponse = (username_or_fullname: string) =>
-  defaultResponse(false, 'ERRORRESPONSE.NAMENOTFOUND', 'NAME', username_or_fullname);
+export const invalidCredentialResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.WRONGCREDENTIALS'),
+  type: 'default',
+});
 
+export const invalidLinkTokenResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.LINKTOKENINVALID'),
+  type: 'default',
+});
+
+export const emailIsVerifiedResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.EMAILISVERIFIED'),
+  type: 'default',
+});
+
+export const existedUserResponse = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.EXISTEDUSER'),
+  type: 'default',
+});
+export const existedDataResponse = (title: string): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.EXISTEDDATA', 'FIELD', title),
+  type: 'default',
+});
+
+export const passwordDoNotMatch = (): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.PASSWORDSDONOTMATCH'),
+  type: 'default',
+});
+
+export const psychologAlreadyApprovedResponse = (name: string): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.PSCHOLOGALREADYAPPROVED', 'NAME', capitalCase(name)),
+  type: 'default',
+});
+
+export const isNotAllowedSeenJournalResponse = (user: string): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'VALIDATION.USERNOTALLOWEDSEENJOURNAL', 'USER', user),
+  type: 'default',
+});
+
+export const nameNotFoundResponse = (username_or_fullname: string): TBadRequestErrorResponse => ({
+  ...defaultResponse(false, 'ERRORRESPONSE.NAMENOTFOUND', 'NAME', username_or_fullname),
+  type: 'default',
+});
+
+export const payloadValidationResponse = (error: ZodError): TPayloadValidation => {
+  const formattedErrors: { [key: string]: string } = {};
+  error.errors.forEach((err) => {
+    const path = err.path.join('.');
+    const upperCasePath = upperCase(path);
+    const translationKey = `VARIABLE.${upperCasePath}`;
+    formattedErrors[path] = sentenceCase(t(err.message, { FIELD: t(translationKey) }));
+  });
+  return {
+    ...defaultResponse(false, 'ERRORRESPONSE.BADREQUEST'),
+    type: 'default',
+    error_details: formattedErrors,
+  };
+};
+
+// Success Response
 export const sendEmaiResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.SENDEMAILVERIFICATION');
 export const verifyEmailResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL');
 export const forgotPasswordResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.FORGOTPASSWORD');
@@ -155,20 +217,6 @@ export const refreshTokenConfigResponse = (): CookieOptions => ({
   sameSite: 'strict',
   maxAge: 24 * 60 * 60 * 1000,
 });
-
-export const payloadValidationResponse = (error: ZodError): TPayloadValidation => {
-  const formattedErrors: { [key: string]: string } = {};
-  error.errors.forEach((err) => {
-    const path = err.path.join('.');
-    const upperCasePath = upperCase(path);
-    const translationKey = `VARIABLE.${upperCasePath}`;
-    formattedErrors[path] = sentenceCase(t(err.message, { FIELD: t(translationKey) }));
-  });
-  return {
-    ...defaultResponse(false, 'ERRORRESPONSE.BADREQUEST'),
-    error_details: formattedErrors,
-  };
-};
 
 export const selfScreeningTestResponse = (selfScreeningData: SelfScreeningData): TSelfScreeningTest => {
   const { depression_score, anxiety_score, stress_score } = selfScreeningData;

@@ -3,6 +3,10 @@ export type TDefault = {
   message: string;
 };
 
+export type TBadRequestErrorResponse = TDefault & {
+  type: 'default' | 'email' | 'approve';
+};
+
 export type TGetResponseDefault = {
   size: number;
   page: number;
@@ -76,7 +80,7 @@ export type TUpdateUser = TDefault & {
 
 export type TTokenUser = TDefault & TTokenUserData;
 
-export type TPayloadValidation = TDefault & {
+export type TPayloadValidation = TBadRequestErrorResponse & {
   error_details: { [key: string]: string };
 };
 

@@ -54,7 +54,7 @@ const getUserJournalForPsychologist = async (req: Request, res: Response) => {
   const { username_or_fullname } = req.params;
   try {
     const foundUser = await UserService.getUserByUsernameOrFullName(username_or_fullname);
-    if (!foundUser) return res.status(404).json(nameNotFoundResponse(username_or_fullname));
+    if (!foundUser) return res.status(400).json(nameNotFoundResponse(username_or_fullname));
     if (!foundUser.allow_journal)
       return res.status(400).json(isNotAllowedSeenJournalResponse(titleCase(foundUser.full_name)));
     const journalUser = await JournalingService.getJournalsByUserId(foundUser.id);
@@ -71,7 +71,7 @@ const getUserJournalDetailForPsychologist = async (req: Request, res: Response) 
   const { username_or_fullname, id } = req.params;
   try {
     const foundUser = await UserService.getUserByUsernameOrFullName(username_or_fullname);
-    if (!foundUser) return res.status(404).json(nameNotFoundResponse(username_or_fullname));
+    if (!foundUser) return res.status(400).json(nameNotFoundResponse(username_or_fullname));
     if (!foundUser.allow_journal)
       return res.status(400).json(isNotAllowedSeenJournalResponse(titleCase(foundUser.full_name)));
     const journalDetailHistory = await JournalingService.getDetailJournalByUserId(foundUser.id, id);
