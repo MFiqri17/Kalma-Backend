@@ -59,6 +59,14 @@ export const authenticateUserSchema = z.object({
     .refine(validateSQLInjection, { message: sqlInjectionMessage }),
 });
 
+export const getRefreshTokenSchema = z.object({
+  refresh_token: z
+    .string({ required_error: requiredMessage })
+    .min(1, { message: requiredMessage })
+    .trim()
+    .refine(validateSQLInjection, { message: sqlInjectionMessage }),
+});
+
 export const updateUserSchema = z.object({
   email: z
     .string({ required_error: requiredMessage })

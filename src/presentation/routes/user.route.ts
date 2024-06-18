@@ -11,6 +11,7 @@ import {
   updateUserSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  getRefreshTokenSchema,
 } from '../../utils/schema/user.schema';
 import ENDPOINTS from '../../utils/constant/endpoint';
 import { upload } from '../../utils/functions/fileFunction';
@@ -80,7 +81,12 @@ UserRouter.get(
   UserController.getUserRole,
 );
 
-UserRouter.get(ENDPOINTS.REFRESH_TOKEN, AuthMiddleware.verifyRefreshToken, AuthController.refreshUserToken);
+UserRouter.get(
+  ENDPOINTS.REFRESH_TOKEN,
+  formValidationMiddleware(getRefreshTokenSchema),
+  AuthMiddleware.verifyRefreshToken,
+  AuthController.refreshUserToken,
+);
 
 UserRouter.get(
   `${ENDPOINTS.VERIFY_EMAIL}/:token`,

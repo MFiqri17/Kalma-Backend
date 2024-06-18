@@ -1,4 +1,3 @@
-import { CookieOptions } from 'express';
 import {
   TTokenUser,
   TCreateUser,
@@ -198,7 +197,12 @@ export const updateUserResponse = (userData: User, isEmailChanged: boolean): TUp
   };
 };
 
-export const tokenUserResponse = (accessToken: string, isVerified: boolean, isAccessToken: boolean): TTokenUser => {
+export const tokenUserResponse = (
+  accessToken: string,
+  refreshToken: string,
+  isVerified: boolean,
+  isAccessToken: boolean,
+): TTokenUser => {
   const accessTokenMessage = isVerified
     ? 'SUCCESSRESPONSE.VERIFIEDAUTHENTICATEUSER'
     : 'SUCCESSRESPONSE.UNVERIFIEDAUTHENTICATEUSER';
@@ -207,14 +211,10 @@ export const tokenUserResponse = (accessToken: string, isVerified: boolean, isAc
   return {
     ...defaultResponse(true, message),
     access_token: accessToken,
+    refresh_token: refreshToken,
     is_email_verified: isVerified,
   };
 };
-
-export const refreshTokenConfigResponse = (): CookieOptions => ({
-  sameSite: 'none',
-  maxAge: 24 * 60 * 60 * 1000,
-});
 
 export const selfScreeningTestResponse = (selfScreeningData: SelfScreeningData): TSelfScreeningTest => {
   const { depression_score, anxiety_score, stress_score } = selfScreeningData;

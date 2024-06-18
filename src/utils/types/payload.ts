@@ -4,6 +4,7 @@ import {
   updateUserSchema,
   resetPasswordSchema,
   forgotPasswordSchema,
+  getRefreshTokenSchema,
 } from '../schema/user.schema';
 import { selfScreeningTestSchema } from '../schema/selfScreening.schema';
 import { createJournal } from '../schema/journaling.schema';
@@ -12,6 +13,7 @@ import { createMusicSchema, updateMusicSchema } from '../schema/music.schema';
 import { createArticle, updateArticle } from '../schema/article.schema';
 
 export type createUserPayload = z.infer<typeof createUserSchema>;
+export type getRefreshTokenPayload = z.infer<typeof getRefreshTokenSchema>;
 export type authenticateUserPayload = z.infer<typeof authenticateUserSchema>;
 export type updateUserPayload = z.infer<typeof updateUserSchema>;
 export type selfScreeningPayload = z.infer<typeof selfScreeningTestSchema>;

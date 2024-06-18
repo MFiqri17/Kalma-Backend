@@ -9,7 +9,7 @@ import {
   invalidRefreshTokenResponse,
   serverErrorResponse,
 } from '../utils/functions/responseFunction';
-import { authenticateUserPayload } from '../utils/types/payload';
+import { authenticateUserPayload, getRefreshTokenPayload } from '../utils/types/payload';
 
 const checkUserCredentials = async (req: Request, res: Response, next: NextFunction) => {
   const { email_or_username, password } = req.body as authenticateUserPayload;
@@ -43,16 +43,12 @@ const verifyAccessToken = async (req: Request, res: Response, next: NextFunction
 };
 
 const verifyRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
-  const cookies = req.cookies;
-  if (!cookies?.refreshToken) return res.status(401).json(invalidRefreshTokenResponse());
-  const refreshToken = cookies?.refreshToken as string;
-  if (!refreshToken) return res.status(401).json(invalidRefreshTokenResponse());
   try {
-    const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN as Secret) as User;
+    const refreshToken = req.body as getRefreshTokenPayload;
+    const user = jwt.verify(refreshToken.refresh_token, process.env.REFRESH_TOKEN as Secret) as User;
     const userExisted = user && (await UserService.getUserById(user.id));
     if (!userExisted) return res.status(401).json(invalidRefreshTokenResponse());
     req.user = userExisted!;
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none' });
     next();
   } catch (error) {
     console.error('Error verify refresh Token', error);

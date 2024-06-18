@@ -142,7 +142,6 @@ const forgotPassword = async (req: Request, res: Response) => {
     const user = await UserService.getUserByEmailOrUsernameOneParams(email_or_username);
     if (!user) return res.status(400).json(invalidCredentialResponse());
     const forgotPasswordToken = generateToken(user, process.env.FORGOT_PASSWORD_TOKEN as Secret, '5m');
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none' });
     EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
     return res.status(200).json(forgotPasswordResponse());
   } catch (error) {
@@ -157,7 +156,6 @@ const resetPassword = async (req: Request, res: Response) => {
     const isPasswordSame = UserService.checkPasswordConfirmation(resetPasswordData);
     if (!isPasswordSame) return res.status(400).json(passwordDoNotMatch());
     const hashedPassword = await AuthService.hashPassword(resetPasswordData.new_password_confirmation);
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none' });
     await UserService.resetPasswordById(req.user!.id, hashedPassword);
     return res.status(200).json(resetPasswordResponse());
   } catch (error) {
