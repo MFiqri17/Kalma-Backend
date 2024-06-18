@@ -212,9 +212,6 @@ export const tokenUserResponse = (accessToken: string, isVerified: boolean, isAc
 };
 
 export const refreshTokenConfigResponse = (): CookieOptions => ({
-  httpOnly: false,
-  secure: false,
-  sameSite: 'none',
   maxAge: 24 * 60 * 60 * 1000,
 });
 
