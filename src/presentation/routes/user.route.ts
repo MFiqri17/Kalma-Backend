@@ -81,7 +81,7 @@ UserRouter.get(
   UserController.getUserRole,
 );
 
-UserRouter.get(
+UserRouter.post(
   ENDPOINTS.REFRESH_TOKEN,
   formValidationMiddleware(getRefreshTokenSchema),
   AuthMiddleware.verifyRefreshToken,
