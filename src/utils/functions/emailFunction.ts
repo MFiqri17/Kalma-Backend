@@ -158,7 +158,7 @@ export const sendEmail = (
 
   if (withButton) {
     const buttonText = capitalizeFirstLetter(t(`${templateKey}.BUTTONTEXT`));
-    const link = `${path}/${token}`;
+    const link = `${path}?token=${token}`;
     emailContent = htmlGenerator(title, greeting, content, closing, true, link, buttonText);
   } else {
     emailContent = htmlGenerator(title, greeting, content, closing, false);
