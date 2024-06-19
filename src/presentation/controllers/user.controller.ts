@@ -99,7 +99,13 @@ const updateUserProperty = async (req: Request, res: Response) => {
     if (isEmailChanged) {
       const verificationToken = generateToken(updatedUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
       await UserService.unverifyUserById(userFound.id);
-      EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL);
+      const origin = req.get('origin');
+      const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
+      if (origin && isOriginPath) {
+        EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
+      } else {
+        EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL);
+      }
       return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
     }
     return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
@@ -115,7 +121,13 @@ const sendEmailVerification = async (req: Request, res: Response) => {
     const isEmailVerified = UserService.isEmailVerified(user!.is_verified);
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
     const verificationToken = generateToken(user!, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-    EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
+    const origin = req.get('origin');
+    const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
+    if (origin && isOriginPath) {
+      EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
+    } else {
+      EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
+    }
     return res.status(200).json(sendEmaiResponse());
   } catch (error) {
     console.error('Error send email verification', error);
@@ -143,7 +155,13 @@ const forgotPassword = async (req: Request, res: Response) => {
     const user = await UserService.getUserByEmailOrUsernameOneParams(email_or_username);
     if (!user) return res.status(400).json(invalidCredentialResponse());
     const forgotPasswordToken = generateToken(user, process.env.FORGOT_PASSWORD_TOKEN as Secret, '5m');
-    EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
+    const origin = req.get('origin');
+    const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
+    if (origin && isOriginPath) {
+      EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD_WEB);
+    } else {
+      EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
+    }
     return res.status(200).json(forgotPasswordResponse());
   } catch (error) {
     console.error('Error forgot password', error);
