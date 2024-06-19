@@ -44,7 +44,8 @@ const createUser = async (req: Request, res: Response) => {
       password: hashedPassword,
     };
     const origin = req.get('origin');
-    if (origin && origin === process.env.WEB_APP_BASE_LOCAL) {
+    const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
+    if (origin && isOriginPath) {
       const newPsycholog = await UserService.createPsycholog(userPayload);
       const verificationToken = generateToken(newPsycholog, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
       EmailService.verificationEmail(newPsycholog, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
