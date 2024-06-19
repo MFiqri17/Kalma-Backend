@@ -42,7 +42,7 @@ const isAccountApproved = async (req: Request, res: Response, next: NextFunction
   try {
     const user = await UserService.getUserById(req.user!.id);
     const role = ['admin', 'psychologist'];
-    if (!user?.is_approved && role.includes(user!.role)) return res.status(403).json(accountIsNotApprovedResponse());
+    if (!user?.is_approved && role.includes(user!.role)) return res.status(400).json(accountIsNotApprovedResponse());
     next();
   } catch (error) {
     console.error('Error checking approved account:', error);
