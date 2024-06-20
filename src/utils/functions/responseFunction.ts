@@ -85,7 +85,7 @@ export const invalidCredentialResponse = (): TBadRequestErrorResponse => ({
 
 export const invalidLinkTokenResponse = (): TBadRequestErrorResponse => ({
   ...defaultResponse(false, 'VALIDATION.LINKTOKENINVALID'),
-  type: 'default',
+  type: 'link',
 });
 
 export const emailIsVerifiedResponse = (): TBadRequestErrorResponse => ({

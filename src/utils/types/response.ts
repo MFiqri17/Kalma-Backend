@@ -4,7 +4,7 @@ export type TDefault = {
 };
 
 export type TBadRequestErrorResponse = TDefault & {
-  type: 'default' | 'email' | 'approve';
+  type: 'default' | 'email' | 'approve' | 'link';
 };
 
 export type TGetResponseDefault = {
