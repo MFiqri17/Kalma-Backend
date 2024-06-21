@@ -45,6 +45,7 @@ const getMusicWithoutCondition = () =>
       author: true,
       genre: true,
       music_link: true,
+      music_image: true,
       created_at_formatted: true,
       modified_at_formatted: true,
       user: {
@@ -82,6 +83,7 @@ const getMusic = async (whereCondition: object, getPayload: Partial<getQueryPayl
       author: true,
       genre: true,
       music_link: true,
+      music_image: true,
       created_at_formatted: true,
       modified_at_formatted: true,
       user: {
@@ -107,6 +109,7 @@ const getMusicById = (musicId: string) =>
       author: true,
       genre: true,
       music_link: true,
+      music_image: true,
       created_at_formatted: true,
       modified_at_formatted: true,
       user: {

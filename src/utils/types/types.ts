@@ -37,6 +37,7 @@ export type Music = {
   author: string | null;
   genre: string;
   music_link: string;
+  music_image: string;
   user?: Pick<User, 'full_name'> | null;
   modifiedUser?: Pick<User, 'full_name'> | null;
   created_at_formatted: string;

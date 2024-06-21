@@ -122,6 +122,7 @@ export type TMusicData = {
   author: string | null;
   genre: string;
   music_link: string;
+  music_image: string;
   created_by?: string;
   created_date: string;
   updated_by?: string;

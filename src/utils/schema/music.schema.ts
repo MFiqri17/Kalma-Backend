@@ -5,6 +5,7 @@ const requiredMessage = 'VALIDATION.REQUIREDMESSAGE';
 const musicCantBeBothMessage = 'VALIDATION.MUSICRESOURCECANTBEBOTH';
 const sqlInjectionMessage = 'VALIDATION.SQLINJECTION';
 const invalidAudioFormat = 'VALIDATION.INVALIDAUDIOFORMAT';
+const invalidImageFileFormat = 'VALIDATION.INVALIDIMAGEFILE';
 
 const getFileFormatUsingSplit = (url: string): string => {
   const parts = url.split('.');
@@ -12,6 +13,7 @@ const getFileFormatUsingSplit = (url: string): string => {
 };
 
 const supportedMusicFormat = ['mp3', 'mpeg'];
+const supportedImageFormat = ['png', 'jpeg', 'jpg'];
 
 export const createMusicSchema = z
   .object({
@@ -26,6 +28,15 @@ export const createMusicSchema = z
       .min(1, { message: requiredMessage })
       .trim()
       .refine(validateSQLInjection, { message: sqlInjectionMessage }),
+    music_image: z
+      .string()
+      .min(1, { message: requiredMessage })
+      .trim()
+      .refine(validateSQLInjection, { message: sqlInjectionMessage })
+      .refine(
+        (value) => value && supportedImageFormat.includes(getFileFormatUsingSplit(value)),
+        invalidImageFileFormat,
+      ),
     music_link: z
       .string()
       .min(1, { message: requiredMessage })
@@ -60,6 +71,15 @@ export const updateMusicSchema = z
       .min(1, { message: requiredMessage })
       .trim()
       .refine(validateSQLInjection, { message: sqlInjectionMessage }),
+    music_image: z
+      .string()
+      .min(1, { message: requiredMessage })
+      .trim()
+      .refine(validateSQLInjection, { message: sqlInjectionMessage })
+      .refine(
+        (value) => value && supportedImageFormat.includes(getFileFormatUsingSplit(value)),
+        invalidImageFileFormat,
+      ),
     music_link: z
       .string()
       .min(1, { message: requiredMessage })
