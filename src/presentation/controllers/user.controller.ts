@@ -130,9 +130,7 @@ const verifyEmail = async (req: Request, res: Response) => {
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
     const verifiedUser = await UserService.verifyUserById(user!.id);
     if (verifiedUser.role === 'psychologist') EmailService.waitingForApprovalEmail(verifiedUser);
-    const accessToken = generateToken(verifiedUser, process.env.ACCESS_TOKEN as Secret, '15m');
-    const refreshToken = generateToken(verifiedUser, process.env.REFRESH_TOKEN as Secret, '1d');
-    return res.status(200).json(verifyEmailResponse(accessToken, refreshToken));
+    return res.status(200).json(verifyEmailResponse());
   } catch (error) {
     console.error('Error verify email', error);
     return res.status(500).json(serverErrorResponse());
@@ -159,10 +157,8 @@ const resetPassword = async (req: Request, res: Response) => {
     const isPasswordSame = UserService.checkPasswordConfirmation(resetPasswordData);
     if (!isPasswordSame) return res.status(400).json(passwordDoNotMatch());
     const hashedPassword = await AuthService.hashPassword(resetPasswordData.new_password_confirmation);
-    const resetedPassword = await UserService.resetPasswordById(req.user!.id, hashedPassword);
-    const accessToken = generateToken(resetedPassword, process.env.ACCESS_TOKEN as Secret, '15m');
-    const refreshToken = generateToken(resetedPassword, process.env.REFRESH_TOKEN as Secret, '1d');
-    return res.status(200).json(resetPasswordResponse(accessToken, refreshToken));
+    await UserService.resetPasswordById(req.user!.id, hashedPassword);
+    return res.status(200).json(resetPasswordResponse());
   } catch (error) {
     console.error('Error reset password', error);
     return res.status(500).json(serverErrorResponse());

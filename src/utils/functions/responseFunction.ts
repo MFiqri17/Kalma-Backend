@@ -139,7 +139,9 @@ export const payloadValidationResponse = (error: ZodError): TPayloadValidation =
 
 // Success Response
 export const sendEmaiResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.SENDEMAILVERIFICATION');
+export const verifyEmailResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL');
 export const forgotPasswordResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.FORGOTPASSWORD');
+export const resetPasswordResponse = () => defaultResponse(true, 'SUCCESSRESPONSE.RESETPASSWORD');
 export const getUserRoleResponse = (role: string) => defaultResponse(true, role);
 export const deleteMusicResponse = (id: string) => defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', id);
 export const deleteArticleResponse = (id: string) =>
@@ -148,22 +150,6 @@ export const approvePsychologResponse = (name: string) =>
   defaultResponse(true, 'SUCCESSRESPONSE.APPROVEPSYCHOLOG', 'NAME', capitalCase(name));
 export const deletePsychologResponse = (name: string) =>
   defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', capitalCase(name));
-
-export const verifyEmailResponse = (accessToken: string, refreshToken: string) => {
-  return {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    ...defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL'),
-  };
-};
-
-export const resetPasswordResponse = (accessToken: string, refreshToken: string) => {
-  return {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    ...defaultResponse(true, 'SUCCESSRESPONSE.RESETPASSWORD'),
-  };
-};
 
 export const createUserResponse = (userData: User): TCreateUser => {
   const newUserData = {
