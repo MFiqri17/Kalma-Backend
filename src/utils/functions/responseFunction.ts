@@ -149,16 +149,18 @@ export const approvePsychologResponse = (name: string) =>
 export const deletePsychologResponse = (name: string) =>
   defaultResponse(true, 'SUCCESSRESPONSE.DELETEMUSICDATA', 'ID', capitalCase(name));
 
-export const verifyEmailResponse = (accessToken: string) => {
+export const verifyEmailResponse = (accessToken: string, refreshToken: string) => {
   return {
     access_token: accessToken,
+    refresh_token: refreshToken,
     ...defaultResponse(true, 'SUCCESSRESPONSE.VERIFYEMAIL'),
   };
 };
 
-export const resetPasswordResponse = (accessToken: string) => {
+export const resetPasswordResponse = (accessToken: string, refreshToken: string) => {
   return {
     access_token: accessToken,
+    refresh_token: refreshToken,
     ...defaultResponse(true, 'SUCCESSRESPONSE.RESETPASSWORD'),
   };
 };
