@@ -48,7 +48,7 @@ const createUser = async (req: Request, res: Response) => {
     if (origin && isOriginPath) {
       const newPsycholog = await UserService.createPsycholog(userPayload);
       const verificationToken = generateToken(newPsycholog, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-      EmailService.verificationEmail(newPsycholog, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
+      EmailService.verificationEmail(newPsycholog, verificationToken, PATH.VERIFICATION_EMAIL);
       return res.status(201).json(createUserResponse(newPsycholog));
     }
     const newUser = await UserService.createUser(userPayload);
@@ -99,13 +99,7 @@ const updateUserProperty = async (req: Request, res: Response) => {
     if (isEmailChanged) {
       const verificationToken = generateToken(updatedUser, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
       await UserService.unverifyUserById(userFound.id);
-      const origin = req.get('origin');
-      const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
-      if (origin && isOriginPath) {
-        EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
-      } else {
-        EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL);
-      }
+      EmailService.verificationEmailChanged(updatedUser, verificationToken, PATH.VERIFICATION_EMAIL);
       return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
     }
     return res.status(200).json(updateUserResponse(updatedUser, isEmailChanged));
@@ -121,13 +115,7 @@ const sendEmailVerification = async (req: Request, res: Response) => {
     const isEmailVerified = UserService.isEmailVerified(user!.is_verified);
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
     const verificationToken = generateToken(user!, process.env.EMAIL_VERIFICATION_TOKEN as Secret, '5m');
-    const origin = req.get('origin');
-    const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
-    if (origin && isOriginPath) {
-      EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL_WEB);
-    } else {
-      EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
-    }
+    EmailService.verificationEmailAgain(user!, verificationToken, PATH.VERIFICATION_EMAIL);
     return res.status(200).json(sendEmaiResponse());
   } catch (error) {
     console.error('Error send email verification', error);
@@ -142,7 +130,8 @@ const verifyEmail = async (req: Request, res: Response) => {
     if (isEmailVerified) return res.status(400).json(emailIsVerifiedResponse());
     const verifiedUser = await UserService.verifyUserById(user!.id);
     if (verifiedUser.role === 'psychologist') EmailService.waitingForApprovalEmail(verifiedUser);
-    return res.status(200).json(verifyEmailResponse());
+    const accessToken = generateToken(verifiedUser, process.env.ACCESS_TOKEN as Secret, '15m');
+    return res.status(200).json(verifyEmailResponse(accessToken));
   } catch (error) {
     console.error('Error verify email', error);
     return res.status(500).json(serverErrorResponse());
@@ -155,13 +144,7 @@ const forgotPassword = async (req: Request, res: Response) => {
     const user = await UserService.getUserByEmailOrUsernameOneParams(email_or_username);
     if (!user) return res.status(400).json(invalidCredentialResponse());
     const forgotPasswordToken = generateToken(user, process.env.FORGOT_PASSWORD_TOKEN as Secret, '5m');
-    const origin = req.get('origin');
-    const isOriginPath = origin === process.env.WEB_APP_BASE_DEVELOPMENT || origin === process.env.WEB_APP_BASE_LOCAL;
-    if (origin && isOriginPath) {
-      EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD_WEB);
-    } else {
-      EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
-    }
+    EmailService.forgotPasswordEmail(user, forgotPasswordToken, PATH.FORGOT_PASSWORD);
     return res.status(200).json(forgotPasswordResponse());
   } catch (error) {
     console.error('Error forgot password', error);
@@ -175,8 +158,9 @@ const resetPassword = async (req: Request, res: Response) => {
     const isPasswordSame = UserService.checkPasswordConfirmation(resetPasswordData);
     if (!isPasswordSame) return res.status(400).json(passwordDoNotMatch());
     const hashedPassword = await AuthService.hashPassword(resetPasswordData.new_password_confirmation);
-    await UserService.resetPasswordById(req.user!.id, hashedPassword);
-    return res.status(200).json(resetPasswordResponse());
+    const resetedPassword = await UserService.resetPasswordById(req.user!.id, hashedPassword);
+    const accessToken = generateToken(resetedPassword, process.env.ACCESS_TOKEN as Secret, '15m');
+    return res.status(200).json(resetPasswordResponse(accessToken));
   } catch (error) {
     console.error('Error reset password', error);
     return res.status(500).json(serverErrorResponse());

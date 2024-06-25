@@ -8,7 +8,7 @@ const authenticateUser = async (req: Request, res: Response) => {
   try {
     const user = await UserService.getUserById(req.user!.id);
     await UserService.updateLastLoggedInById(user!.id);
-    const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '1m');
+    const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '15m');
     const refreshToken = generateToken(user!, process.env.REFRESH_TOKEN as Secret, '1d');
     res.status(200).json(tokenUserResponse(accessToken, refreshToken, user!.is_verified, true));
     return;
@@ -21,7 +21,7 @@ const authenticateUser = async (req: Request, res: Response) => {
 const refreshUserToken = async (req: Request, res: Response) => {
   try {
     const user = await UserService.getUserById(req.user!.id);
-    const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '1m');
+    const accessToken = generateToken(user!, process.env.ACCESS_TOKEN as Secret, '15m');
     const refreshToken = generateToken(user!, process.env.REFRESH_TOKEN as Secret, '1d');
     res.status(200).json(tokenUserResponse(accessToken, refreshToken, user!.is_verified, false));
     return;
