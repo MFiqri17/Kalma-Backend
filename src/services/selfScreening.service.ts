@@ -7,7 +7,7 @@ const createSelfScreening = (screeningData: selfScreeningExtendedPayload, userId
   SelfScreeningData.createSelfScreening(screeningData, userId);
 
 const getSelfScreenings = async (userId: string, getPayload?: Partial<getQueryPayload>) => {
-  if (getPayload) {
+  if (getPayload && Object.keys(getPayload).length > 0) {
     const { search_value } = getPayload;
     const stringColumns = ['depression_status', 'anxiety_status', 'stress_status', 'created_at_formatted'];
     const integerColumns = ['depression_score', 'anxiety_score', 'stress_score'];

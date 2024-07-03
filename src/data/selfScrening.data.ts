@@ -3,16 +3,6 @@ import { getQueryPayload } from '../utils/types/payload';
 import { selfScreeningExtendedPayload } from '../utils/types/types';
 import { getFormatDate } from '../utils/functions/conditionFunctions';
 
-const createSelfScreening = (screeningData: selfScreeningExtendedPayload, userId: string) =>
-  prisma.screenings.create({
-    data: {
-      created_by: userId,
-      created_at: getFormatDate(),
-      created_at_formatted: getFormatDate('MMMM Do YYYY, HH:mm:ss'),
-      ...screeningData,
-    },
-  });
-
 const getSelfScreeningTotalDataWithoutCondition = (userId: string) =>
   prisma.screenings.count({
     where: {
@@ -33,6 +23,16 @@ const getSelfCreeningTotalData = (userId: string, whereCondition: object) =>
   prisma.screenings.count({
     where: {
       AND: [{ created_by: userId }, whereCondition],
+    },
+  });
+
+const createSelfScreening = (screeningData: selfScreeningExtendedPayload, userId: string) =>
+  prisma.screenings.create({
+    data: {
+      created_by: userId,
+      created_at: getFormatDate(),
+      created_at_formatted: getFormatDate('MMMM Do YYYY, HH:mm:ss'),
+      ...screeningData,
     },
   });
 

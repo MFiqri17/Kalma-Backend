@@ -34,10 +34,10 @@ export const updateArticle = z.object({
     .custom<Express.Multer.File>((val) => typeof val !== 'string' && val !== '', invalidImageFileFormat)
     .refine((file) => file && file.mimetype.startsWith('image/'), invalidImageFileFormat)
     .optional(),
-  article_type: z.string().array().nonempty({
+  article_type: z.string().array().min(1, {
     message: arrayCantbeEmpty,
   }),
-  content: z.string().array().nonempty({
+  content: z.string().array().min(1, {
     message: arrayCantbeEmpty,
   }),
 });
