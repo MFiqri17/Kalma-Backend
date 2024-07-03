@@ -46,7 +46,7 @@ export const createMusicSchema = z
       .optional(),
     music_file: z
       .custom<Express.Multer.File>((val) => typeof val !== 'string' && val !== '', invalidAudioFormat)
-      .refine((file) => file && supportedMusicFormat.includes(file.mimetype), invalidAudioFormat)
+      .refine((file) => file && file.mimetype.startsWith('audio/'), invalidAudioFormat)
       .optional(),
   })
   .refine((data) => data.music_link || data.music_file, {
@@ -89,7 +89,7 @@ export const updateMusicSchema = z
       .optional(),
     music_file: z
       .custom<Express.Multer.File>((val) => typeof val !== 'string' && val !== '', invalidAudioFormat)
-      .refine((file) => file && supportedMusicFormat.includes(file.mimetype), invalidAudioFormat)
+      .refine((file) => file && file.mimetype.startsWith('audio/'), invalidAudioFormat)
       .optional(),
   })
   .refine((data) => !(data.music_link && data.music_file), {
