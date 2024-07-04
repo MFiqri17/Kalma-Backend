@@ -54,7 +54,7 @@ const updateUserById = (id: string, userData: updateUserPayload, avatar_url?: st
   const { age, allow_journal, avatar, ...restData } = userData;
   return prisma.users.update({
     where: { id },
-    data: { age: Number(age), allow_journal: Boolean(allow_journal), avatar_link: avatar_url, ...restData },
+    data: { age: Number(age), allow_journal: allow_journal === 'true', avatar_link: avatar_url, ...restData },
   });
 };
 

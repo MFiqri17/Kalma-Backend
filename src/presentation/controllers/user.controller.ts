@@ -86,6 +86,7 @@ const getUserRole = async (req: Request, res: Response) => {
 const updateUserProperty = async (req: Request, res: Response) => {
   try {
     const { full_name, ...restUserPayload } = req.body as updateUserPayload;
+    console.log(req.body);
     const userPayload = {
       ...restUserPayload,
       full_name: lowerCase(full_name),
