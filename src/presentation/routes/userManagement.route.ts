@@ -7,7 +7,7 @@ import UserMiddleware from '../../middleware/user.middleware';
 
 const UserManagementRouter = Router();
 
-UserManagementRouter.get(
+UserManagementRouter.post(
   '/',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,

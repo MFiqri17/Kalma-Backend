@@ -11,7 +11,7 @@ const JournalingRouter = Router();
 
 // user action for journal
 JournalingRouter.post(
-  ENDPOINTS.USERS_JOURNAL,
+  ENDPOINTS.USERS_JOURNAL + '/create',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),
@@ -28,7 +28,7 @@ JournalingRouter.post(
 );
 
 JournalingRouter.get(
-  ENDPOINTS.USERS_JOURNAL + '/:id',
+  ENDPOINTS.USERS_JOURNAL + '/get/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),

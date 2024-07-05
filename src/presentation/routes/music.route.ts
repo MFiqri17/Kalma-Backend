@@ -9,8 +9,8 @@ import UserMiddleware from '../../middleware/user.middleware';
 
 const MusicRouter = Router();
 
-MusicRouter.get(
-  '/',
+MusicRouter.post(
+  '/get',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.isAccountApproved,
@@ -18,7 +18,7 @@ MusicRouter.get(
 );
 
 MusicRouter.post(
-  '/',
+  '/create',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),
@@ -29,7 +29,7 @@ MusicRouter.post(
 );
 
 MusicRouter.get(
-  '/:id',
+  '/get/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.isAccountApproved,
@@ -37,7 +37,7 @@ MusicRouter.get(
 );
 
 MusicRouter.put(
-  '/:id',
+  '/update/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),
@@ -48,7 +48,7 @@ MusicRouter.put(
 );
 
 MusicRouter.delete(
-  '/:id',
+  '/delete/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),

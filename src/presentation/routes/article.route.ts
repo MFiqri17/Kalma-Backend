@@ -9,8 +9,8 @@ import { createArticle, updateArticle } from '../../utils/schema/article.schema'
 
 const ArticleRouter = Router();
 
-ArticleRouter.get(
-  '/',
+ArticleRouter.post(
+  '/get',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.isAccountApproved,
@@ -18,7 +18,7 @@ ArticleRouter.get(
 );
 
 ArticleRouter.post(
-  '/',
+  '/create',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),
@@ -29,7 +29,7 @@ ArticleRouter.post(
 );
 
 ArticleRouter.get(
-  '/:id',
+  '/get/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.isAccountApproved,
@@ -37,7 +37,7 @@ ArticleRouter.get(
 );
 
 ArticleRouter.put(
-  '/:id',
+  '/update/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),
@@ -48,7 +48,7 @@ ArticleRouter.put(
 );
 
 ArticleRouter.delete(
-  '/:id',
+  '/delete/:id',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['admin', 'psychologist']),

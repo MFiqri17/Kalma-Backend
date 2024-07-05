@@ -18,7 +18,7 @@ SelfScreeningRouter.post(
   SelfScreeningController.createSelfScreening,
 );
 
-SelfScreeningRouter.get(
+SelfScreeningRouter.post(
   ENDPOINTS.GET_SELF_SCREENING,
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
