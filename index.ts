@@ -40,9 +40,7 @@ const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    callback(null, true);
-  },
+  origin: ['http://localhost:3000', 'https://kalma-webapp.vercel.app'],
   credentials: true,
 };
 
