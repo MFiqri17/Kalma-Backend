@@ -10,7 +10,7 @@ import UserMiddleware from '../../middleware/user.middleware';
 const MusicRouter = Router();
 
 MusicRouter.post(
-  '/get/',
+  '/get',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.isAccountApproved,
