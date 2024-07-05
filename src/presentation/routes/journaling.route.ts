@@ -19,7 +19,7 @@ JournalingRouter.post(
   JournalingController.createJournal,
 );
 
-JournalingRouter.get(
+JournalingRouter.post(
   ENDPOINTS.USERS_JOURNAL,
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
