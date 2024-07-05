@@ -20,7 +20,7 @@ JournalingRouter.post(
 );
 
 JournalingRouter.post(
-  ENDPOINTS.USERS_JOURNAL,
+  ENDPOINTS.USERS_JOURNAL + '/get',
   AuthMiddleware.verifyAccessToken,
   UserMiddleware.isUserEmailVerified,
   UserMiddleware.checkUserRole(['user']),
