@@ -236,14 +236,14 @@ export const selfScreeningHistoryResponse = (
   selfScreeningData: SelfScreeningHistoryParams,
   getQueryPayload: Partial<getQueryPayload>,
 ): TSelfScreeningHistory => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const data = selfScreeningData.data.map((screeningData) => ({
     id: screeningData.id,
     created_date: screeningData.created_at_formatted,
     ...selfScreeningGetterFunction(screeningData),
   }));
   const totalItems = selfScreeningData.totalCount;
-  const sizeData = data.length;
+  const sizeData = size ?? data.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
@@ -291,7 +291,7 @@ export const getJournalResponse = (
   journalData: JournalHistoryParams,
   getQueryPayload: Partial<getQueryPayload>,
 ): TGetJournalHistory => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const data: TJournalData[] = journalData.data.map((journal) => ({
     id: journal.id,
     title: journal.title,
@@ -300,7 +300,7 @@ export const getJournalResponse = (
     created_date: journal.created_at_formatted,
   }));
   const totalItems = journalData.totalCount;
-  const sizeData = data.length;
+  const sizeData = size ?? data.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
@@ -320,7 +320,7 @@ export const getJournalResponseForPsychologist = (
   userData: Partial<User>,
   getQueryPayload: Partial<getQueryPayload>,
 ): TGetUserJournalForPsychologist => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const journal: TJournalData[] = journalData.data.map((journal) => ({
     id: journal.id,
     title: journal.title,
@@ -334,7 +334,7 @@ export const getJournalResponseForPsychologist = (
     age: userData.age,
   };
   const totalItems = journalData.totalCount;
-  const sizeData = journal.length;
+  const sizeData = size ?? journal.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
@@ -384,7 +384,7 @@ export const createMusicResponse = (musicData: Music): TCreateMusic => {
 };
 
 export const getMusicResponse = (musicAllData: MusicAllData, getQueryPayload: Partial<getQueryPayload>): TGetMusic => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const data = musicAllData.data.map((data) => ({
     id: data.id,
     title: data.title,
@@ -398,7 +398,7 @@ export const getMusicResponse = (musicAllData: MusicAllData, getQueryPayload: Pa
     updated_date: data.modified_at_formatted,
   }));
   const totalItems = musicAllData.totalCount;
-  const sizeData = data.length;
+  const sizeData = size ?? data.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
@@ -455,7 +455,7 @@ export const getPsychologResponse = (
   pschologData: GetPsychologParams,
   getQueryPayload: Partial<getQueryPayload>,
 ): TGetPsycholog => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const data = pschologData.data.map((data) => ({
     id: data.id,
     full_name: capitalCase(data.full_name),
@@ -466,7 +466,7 @@ export const getPsychologResponse = (
     created_date: data.created_at_formatted,
   }));
   const totalItems = pschologData.totalCount;
-  const sizeData = data.length;
+  const sizeData = size ?? data.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
@@ -503,7 +503,7 @@ export const getArticleResponse = (
   articleDataParams: GetArticleParams,
   getQueryPayload: Partial<getQueryPayload>,
 ): TGetArticle => {
-  const { page } = getQueryPayload;
+  const { page, size } = getQueryPayload;
   const data = articleDataParams.data.map((data) => ({
     id: data.id,
     title: data.title,
@@ -516,7 +516,7 @@ export const getArticleResponse = (
     updated_date: data.modified_at_formatted,
   }));
   const totalItems = articleDataParams.totalCount;
-  const sizeData = data.length;
+  const sizeData = size ?? data.length;
   const totalPages = totalItems > 0 && sizeData > 0 ? Math.ceil(totalItems / sizeData) : 0;
   const getResponseProps = {
     size: sizeData,
