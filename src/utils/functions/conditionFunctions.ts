@@ -4,27 +4,29 @@ import REGEX from '../constant/regex';
 import { lowerCase } from 'text-case';
 
 export const getArticleWhereConditionFunction = (getPayload: Partial<getQueryPayload>): object => {
-  const { search_value, search_column } = getPayload;
+  const { search_value, search_column, filter_column, filter_value } = getPayload;
   if (getPayload && search_value) {
     const arrayColumn = ['content', 'article_type'];
-    if (search_column) {
-      if (arrayColumn.includes(search_column))
+    const column = search_column ?? filter_column;
+    const value = search_value ?? filter_value;
+    if (column) {
+      if (arrayColumn.includes(column))
         return {
-          [search_column]: {
-            has: lowerCase(search_value),
+          [column]: {
+            has: lowerCase(value),
           },
         };
       else if (search_column === 'user')
         return {
           user: {
             full_name: {
-              contains: lowerCase(search_value),
+              contains: lowerCase(value),
             },
           },
         };
       else
         return {
-          [search_column]: {
+          [column]: {
             contains: lowerCase(search_value),
           },
         };
