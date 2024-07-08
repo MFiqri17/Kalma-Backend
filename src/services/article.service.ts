@@ -17,7 +17,9 @@ const createArticle = async (articleData: createArticlePayload, userId: string) 
 
 const getArticles = async (getPayload?: Partial<getQueryPayload>) => {
   if (getPayload && Object.keys(getPayload).length > 0) {
+    console.log(getPayload);
     const whereCondition = getArticleWhereConditionFunction(getPayload);
+    console.log(whereCondition);
     const [totalCount, data] = await Promise.all([
       ArticleData.getArticleTotalData(whereCondition),
       ArticleData.getArticleData(whereCondition, getPayload),

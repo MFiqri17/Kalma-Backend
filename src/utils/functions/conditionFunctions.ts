@@ -5,10 +5,11 @@ import { lowerCase } from 'text-case';
 
 export const getArticleWhereConditionFunction = (getPayload: Partial<getQueryPayload>): object => {
   const { search_value, search_column, filter_column, filter_value } = getPayload;
-  if (getPayload && search_value) {
+  const value = search_value || filter_value;
+  if (getPayload && value) {
     const arrayColumn = ['content', 'article_type'];
-    const column = search_column ?? filter_column;
-    const value = search_value ?? filter_value;
+    const column = search_column || filter_column;
+
     if (column) {
       if (arrayColumn.includes(column))
         return {
@@ -27,40 +28,40 @@ export const getArticleWhereConditionFunction = (getPayload: Partial<getQueryPay
       else
         return {
           [column]: {
-            contains: lowerCase(search_value),
+            contains: lowerCase(value),
           },
         };
     }
     return {
       OR: [
-        { title: { contains: lowerCase(search_value), mode: 'insensitive' } },
+        { title: { contains: lowerCase(value), mode: 'insensitive' } },
         {
           content: {
-            has: lowerCase(search_value),
+            has: lowerCase(value),
           },
         },
         {
           article_type: {
-            has: lowerCase(search_value),
+            has: lowerCase(value),
           },
         },
         {
           user: {
             full_name: {
-              contains: lowerCase(search_value),
+              contains: lowerCase(value),
               mode: 'insensitive',
             },
           },
         },
         {
           created_at_formatted: {
-            contains: lowerCase(search_value),
+            contains: lowerCase(value),
             mode: 'insensitive',
           },
         },
         {
           modified_at_formatted: {
-            contains: lowerCase(search_value),
+            contains: lowerCase(value),
             mode: 'insensitive',
           },
         },
